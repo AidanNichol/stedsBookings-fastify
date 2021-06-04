@@ -1,0 +1,12 @@
+/.env
+/.stedsServer.sh.swp
+/.vscode
+/Passengerfile.json
+/app.js
+/config
+/database copy.sqlite
+/database.sqlite
+/logs
+/node_modules
+/tmp
+/yarn-error.log
