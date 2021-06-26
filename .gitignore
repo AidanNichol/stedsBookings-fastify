@@ -10,3 +10,6 @@
 /node_modules
 /tmp
 /yarn-error.log
+/junk
+deadfile*
+setup/userData.js

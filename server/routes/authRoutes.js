@@ -1,70 +1,55 @@
-const passport = require('fastify-passport');
-const fs = require('fs');
-const queries = require('../db/queries/users');
+const { User } = require('../../models');
+const bcrypt = require('bcryptjs');
+const getenv = require('getenv');
 
-async function authRoutes(fastify, options) {
-  fastify.get('/auth/register', async (request, reply) => {
-    ctx.type = 'html';
-    ctx.body = fs.createReadStream('./server/views/register.html');
+async function authRoutes(fastify) {
+  fastify.register(require('fastify-secure-session'), {
+    // the name of the session cookie, defaults to 'session'
+    cookieName: 'stEdsBookings',
+    secret: getenv('SECRET'),
+    salt: getenv('SALT'),
+    cookie: {
+      path: '/',
+      // options for setCookie, see https://github.com/fastify/fastify-cookie
+    },
   });
+  fastify.post('/login', async (request, reply) => {
+    const { username, password } = request.body;
+    console.log(request.body, username, password);
+    try {
+      // await request.session.delete();
 
-  fastify.post('/auth/register', async (request, reply) => {
-    await queries.addUser(ctx.request.body);
-    return passport.authenticate('local', (err, user, info, status) => {
-      if (user) {
-        ctx.login(user);
-        ctx.redirect('/auth/status');
-      } else {
-        ctx.status = 400;
-        ctx.body = { status: 'error' };
-      }
-    })(ctx);
-  });
-
-  fastify.get('/auth/login', async (request, reply) => {
-    if (!ctx.isAuthenticated()) {
-      ctx.type = 'html';
-      ctx.body = fs.createReadStream('./server/views/login.html');
-    } else {
-      ctx.redirect('/auth/status');
+      const user = await User.findOne({
+        where: { username: username },
+      });
+      console.log('User:', user);
+      if (!user) return { authError: `unknown username: ${username}` };
+      const ok = bcrypt.compareSync(password, user.password);
+      if (!ok) return { authError: `invalid username/password` };
+      user.roles = user.roles.split(/, ?/);
+      let data = { ok, username, roles: user.roles };
+      request.session.set('data', data);
+      reply.send(data);
+    } catch (err) {
+      console.warn(err);
+      throw new Error(err);
     }
   });
 
-  fastify.post('/auth/login', async (request, reply) => {
-    return passport.authenticate('local', (err, user, info, status) => {
-      if (user) {
-        console.log(
-          'post/auth/login',
-          JSON.stringify(user),
-          ctx.isAuthenticated(),
-          ctx.state.user,
-        );
-        ctx.login(user);
-        ctx.redirect('/auth/status');
-      } else {
-        ctx.status = 400;
-        ctx.body = { status: 'error' };
-      }
-    })(ctx);
+  fastify.get('/logCheck', async (request, reply) => {
+    const data = await request.session.get('data');
+    console.log('logCheck', data);
+    if (!data) {
+      reply.send({ ok: false, authError: 'not logged in' });
+      return;
+    }
+    // return data;
+    reply.send(data);
   });
 
-  fastify.get('/auth/logout', async (request, reply) => {
-    if (ctx.isAuthenticated()) {
-      ctx.logout();
-      ctx.redirect('/auth/login');
-    } else {
-      ctx.body = { success: false };
-      ctx.throw(401);
-    }
-  });
-
-  fastify.get('/auth/status', async (request, reply) => {
-    if (ctx.isAuthenticated()) {
-      ctx.type = 'html';
-      ctx.body = fs.createReadStream('./server/views/status.html');
-    } else {
-      ctx.redirect('/auth/login');
-    }
+  fastify.get('/logout', async (request, reply) => {
+    await request.session.delete();
+    reply.send({ text: 'logged out' });
   });
 }
 module.exports = { authRoutes };

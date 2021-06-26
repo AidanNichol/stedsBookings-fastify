@@ -22,7 +22,7 @@ const Member = {
     get() {
       return `${this.firstName} ${this.lastName}`;
     },
-    set(value) {
+    set() {
       throw new Error('Do not try to set the `fullName` value!');
     },
   },
@@ -31,8 +31,18 @@ const Member = {
     get() {
       return `${this.lastName}, ${this.firstName}`;
     },
-    set(value) {
+    set() {
       throw new Error('Do not try to set the `fullName` value!');
+    },
+  },
+
+  memNo: {
+    type: DataTypes.VIRTUAL,
+    get() {
+      return parseInt(this.memberId?.substr(1));
+    },
+    set() {
+      throw new Error('Do not try to set the `memNo` value!');
     },
   },
   subsStatus: {
@@ -40,7 +50,7 @@ const Member = {
     get() {
       return getSubsStatus(this.memberStatus, this.subscription);
     },
-    set(value) {
+    set() {
       throw new Error('Do not try to set the `fullName` value!');
     },
   },

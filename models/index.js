@@ -71,15 +71,15 @@ const db = {
   User,
 };
 // add scopes
-require('./scopes/bookingLogScopes')(db);
-require('./scopes/bookingScopes')(db);
-require('./scopes/walkScopes')(db);
-require('./scopes/paymentScopes')(db);
-require('./scopes/refundScopes')(db);
-require('./scopes/accountScopes')(db);
-require('./scopes/memberScopes')(db);
-require('./scopes/allocationScopes')(db);
-require('./scopes/bankingScopes')(db);
+require('../junk/scopes/bookingLogScopes')(db);
+require('../junk/scopes/bookingScopes')(db);
+require('../junk/scopes/walkScopes')(db);
+require('../junk/scopes/paymentScopes')(db);
+require('../junk/scopes/refundScopes')(db);
+require('../junk/scopes/accountScopes')(db);
+require('../junk/scopes/memberScopes')(db);
+require('../junk/scopes/allocationScopes')(db);
+require('../junk/scopes/bankingScopes')(db);
 
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;

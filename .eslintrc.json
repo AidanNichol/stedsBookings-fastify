@@ -1,0 +1,17 @@
+{
+  "env": {
+    "browser": false,
+    "es6": true
+  },
+  "parserOptions": {
+    "ecmaVersion": 2020,
+    "sourceType": "script"
+  },
+  "extends": ["eslint:recommended", "plugin:node/recommended"],
+
+  "rules": {},
+  "globals": {
+    "__filename": true,
+    "__dirname": true
+  }
+}

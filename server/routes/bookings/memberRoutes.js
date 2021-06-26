@@ -1,56 +1,78 @@
 const models = require('../../../models');
-const { todaysDate: today } = require('../../../models/scopes/dateFns');
-const _ = require('lodash');
+var { eventEmitter } = require('../../eventEmitter');
 
-async function memberRoutes(fastify, options) {
-  // fastify.get(``, async (request, reply) => {
-  //   const movies = await queries.getInfo();
-  //   return movies;
-  // });
-  // fastify.get(`/sq/:query/:accountId/:startDate`, async (req, reply) => {
-  //   const { query, ...params } = req.params;
-  //   console.log(query, params);
-  //   const data = await queries[query](params);
-  //   return data;
-  // });
-  // fastify.get(`/:cmd`, async (request, reply) => {
-  //   return await queries.getCommand(request.params);
-  // });
-  // fastify.get(`/:table/:scope`, async (request, reply) => {
-  //   const { table, scope } = request.params;
-  //   return await queries.getQuery(table, scope);
-  // });
-  // fastify.get(`/:table/:scope/:id`, async (request, reply) => {
-  //   const { table, scope, id } = request.params;
-  //   const data = await queries.findByPk(table, scope, id);
-  //   console.log('returned', data);
-  //   reply, send(data);
-  // });
-  // fastify.get(`/:table/:scope/:key/:id`, async (request, reply) => {
-  //   const { table, scope, key, id } = request.params;
-  //   return await queries.findAllByKey(table, scope, key, id);
-  // });
-  // fastify.get(`{/:rest/:what}`, async (request, reply) => {
-  //   reply.status(404).send('bookings - url unmatched.');
-  // });
-  // fastify.post(`/patches`, async (request, reply) => {
-  //   console.log('booking/patches', request);
-  //   const data = await updates.withPatches(request.request.body);
-  //   reply.code(201).send(data);
-  // });
-  // fastify.put(`/booking/:id`, async (request, reply) => {
-  //   return await queries.updateMovie(request.params.id, request.request.body);
-  // });
-  // fastify.delete(`/booking/:id`, async (request, reply) => {
-  //   const movie = await queries.deleteMovie(request.params.id);
-  //   if (movie.length) {
-  //     return {
-  //       status: 'success',
-  //       data: movie,
-  //     };
-  //   } else {
-  //     throw new Error(`id:${request.params.id} can't be deleted - does not exist`);
-  //   }
-  // });
+// const { todaysDate: today } = require('./dateFns');
+// const _ = require('lodash');
+const memberIndex = {
+  attributes: [
+    ['memberId', 'id'],
+    'memberId',
+    'memNo',
+    'firstName',
+    'lastName',
+    'shortName',
+    'memberStatus',
+    'subscription',
+    'fullName',
+    'sortName',
+    'accountId',
+    'subsStatus',
+  ],
+};
+async function memberRoutes(fastify) {
+  fastify.get(`/index`, async () => {
+    return await models.Member.findAll(memberIndex);
+  });
+  fastify.get(`/memberData/:id`, async (request) => {
+    const { id } = request.params;
+
+    // try {
+    console.log('findAllByKey', { id });
+    let data = await models.Member.findByPk(id, {
+      // where: { [key]: id },
+      include: {
+        model: models.Account,
+        include: {
+          model: models.Member,
+          attributes: [
+            ['memberId', 'id'],
+            'memberId',
+            'memNo',
+            'firstName',
+            'lastName',
+            'shortName',
+            'memberStatus',
+            'subscription',
+            'fullName',
+            'sortName',
+            'accountId',
+            'subsStatus',
+          ],
+        },
+      },
+    });
+    // } catch (error) {
+    //   let { message, name, DatabaseError, sql } = error;
+
+    //   throw new Error( { message, name, DatabaseError, sql });
+    //   return { error: { message, name, DatabaseError } };
+    // }
+
+    // console.log('returned', data);
+    return data;
+  });
 }
-module.exports = memberRoutes;
+module.exports = { memberRoutes, refreshMemberIndex };
+let timeoutId;
+function refreshMemberIndex(memberId) {
+  if (timeoutId) clearTimeout(timeoutId);
+  timeoutId = setTimeout(async () => {
+    console.log('refreshing', 'MemberIndex');
+    let data = await models.Member.findByPk(memberId, memberIndex);
+    // console.log('emmitting', data);
+    data = data.get({ plain: true });
+    delete data.id;
+    eventEmitter.emit('change_event', { id: 'refreshMemberIndex', ...data });
+    timeoutId = null;
+  }, 100);
+}

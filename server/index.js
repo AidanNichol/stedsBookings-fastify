@@ -1,36 +1,27 @@
 // Require the framework and instantiate it
 const fastifyPkg = require('fastify');
 const fastifyCors = require('fastify-cors');
-const fastifyCookie = require('fastify-cookie');
-const fastifyStatic = require('fastify-static');
+// const fastifyCookie = require('fastify-cookie');
+// const fastifyStatic = require('fastify-static');
 const multipart = require('fastify-multipart');
-// const EventIterator = require('event-iterator');
-var { EventEmitter, on } = require('events');
-
-// Create an eventEmitter object
-var eventEmitter = new EventEmitter();
-
-// const multipart = require('fastify-multipart');
+var { eventEmitter, on } = require('./eventEmitter');
 
 const bookingsRoutes = require('./routes/bookings/bookingsRoutes.js');
 const { authRoutes } = require('./routes/authRoutes.js');
 
-const getEnv = require('getenv');
-const path = require('path');
-const jetpack = require('fs-jetpack');
-const getenv = require('getenv');
+// const getEnv = require('getenv');
+// const path = require('path');
+// const jetpack = require('fs-jetpack');
+// const getenv = require('getenv');
 const http = require('http');
-const { cwd, read } = jetpack;
-const { promisify } = require('util');
-const sleep = promisify(setTimeout);
+// const { cwd, read } = jetpack;
+// const { promisify } = require('util');
+// const sleep = promisify(setTimeout);
 console.log('loading');
-// const galleryDataPath = process.env.GALLERY_DATA;
-// console.log('galleryData', galleryDataPath);
-const fs = require('fs');
-// const walkDataPath = process.env.WALK_DATA;
-// console.log('walkdata', walkDataPath);
-const sitePrefix = getenv('SITE_PREFIX', '');
-const serverFactory = (handler, opts) => {
+// const fs = require('fs');
+const sitePrefix = 'bookingsServer/';
+// const sitePrefix = getenv('SITE_PREFIX', '');
+const serverFactory = (handler) => {
   const server = http.createServer((req, res) => {
     handler(req, res);
   });
@@ -67,7 +58,7 @@ fastify.register(fastifyCors, {
 
 fastify.register(require('fastify-sse-v2'));
 
-fastify.get(`/${sitePrefix}`, async (request, reply) => {
+fastify.get(`/${sitePrefix}`, async () => {
   return {
     hello: 'world',
     version: process.versions.node,
@@ -85,27 +76,52 @@ fastify.get(`/${sitePrefix}`, async (request, reply) => {
 //     })(),
 //   );
 // });
-let i = 0;
 
 fastify.get('/sse2', (request, reply) => {
   // const eventEmitter = new EventEmitter();
   reply.sse(
     (async function* () {
-      for await (const event of on(eventEmitter, 'some_event')) {
-        // console.log('yielding', event.name, event);
+      for await (const event of on(eventEmitter, 'change_event')) {
+        let { id, ...data } = event.pop();
+        yield { id, data: JSON.stringify(data) };
+      }
+    })(),
+  );
+  let i = 0;
+  let j = 0;
+  setInterval(() => {
+    eventEmitter.emit('change_event', {
+      id: 'some_event',
+      i: String(++i),
+      other: 'what',
+    });
+    // console.log('some_event', String(i));
+  }, 3000);
+  setInterval(() => {
+    eventEmitter.emit('change_event', {
+      id: 'other_event',
+      j: String(++j),
+      other: 'why',
+    });
+    // console.log('some_event', String(i));
+  }, 7000);
+});
+fastify.get('/monitorChanges', (request, reply) => {
+  console.log('monitorChanges activated');
+  reply.sse(
+    (async function* () {
+      for await (const event of on(eventEmitter, 'change_event')) {
+        let { id, ...data } = event.pop();
+        console.log('yielding', id, data);
         yield {
-          id: 'some_event',
-          data: JSON.stringify(event),
-          crap: 'paper',
+          id,
+          data: JSON.stringify(data),
         };
       }
     })(),
   );
 });
-setInterval(() => {
-  eventEmitter.emit('some_event', { i: String(++i), other: 'what' });
-  // console.log('some_event', String(i));
-}, 2000);
+
 fastify.register(bookingsRoutes, { prefix: `${sitePrefix}bookings` });
 fastify.register(authRoutes, { prefix: `${sitePrefix}auth` });
 
@@ -115,6 +131,7 @@ const runit = async () => {
     await fastify.listen(4444);
   } catch (err) {
     fastify.log.error(err);
+    // eslint-disable-next-line no-process-exit
     process.exit(1);
   }
   console.log(
