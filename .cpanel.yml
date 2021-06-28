@@ -2,4 +2,4 @@
 deployment:
   tasks:
     - export DEPLOYPATH=/home/ajnichol/public_html/bookingsServer
-    - /bin/cp index.js $DEPLOYPATH
+    - /bin/cp dist/index.js $DEPLOYPATH
