@@ -928,10 +928,10 @@ var require_supports_color = __commonJS({
         return 3;
       }
       if ("TERM_PROGRAM" in env) {
-        const version = parseInt((env.TERM_PROGRAM_VERSION || "").split(".")[0], 10);
+        const version2 = parseInt((env.TERM_PROGRAM_VERSION || "").split(".")[0], 10);
         switch (env.TERM_PROGRAM) {
           case "iTerm.app":
-            return version >= 3 ? 3 : 2;
+            return version2 >= 3 ? 3 : 2;
           case "Apple_Terminal":
             return 2;
         }
@@ -16920,8 +16920,8 @@ var require_package = __commonJS({
 var require_meta = __commonJS({
   "node_modules/pino/lib/meta.js"(exports2, module2) {
     "use strict";
-    var { version } = require_package();
-    module2.exports = { version };
+    var { version: version2 } = require_package();
+    module2.exports = { version: version2 };
   }
 });
 
@@ -16965,7 +16965,7 @@ var require_proto = __commonJS({
       buildFormatters
     } = require_tools();
     var {
-      version
+      version: version2
     } = require_meta();
     var constructor = class Pino {
     };
@@ -16976,7 +16976,7 @@ var require_proto = __commonJS({
       setBindings,
       flush,
       isLevelEnabled,
-      version,
+      version: version2,
       get level() {
         return this[getLevelSym]();
       },
@@ -17117,7 +17117,7 @@ var require_pino = __commonJS({
       buildFormatters,
       noop
     } = require_tools();
-    var { version } = require_meta();
+    var { version: version2 } = require_meta();
     var {
       chindingsSym,
       redactFmtSym,
@@ -17296,7 +17296,7 @@ var require_pino = __commonJS({
     module2.exports.stdSerializers = serializers;
     module2.exports.stdTimeFunctions = Object.assign({}, time);
     module2.exports.symbols = symbols;
-    module2.exports.version = version;
+    module2.exports.version = version2;
     module2.exports.default = pino;
     module2.exports.pino = pino;
   }
@@ -19053,29 +19053,29 @@ var require_semver = __commonJS({
     var parseOptions = require_parse_options();
     var { compareIdentifiers } = require_identifiers();
     var SemVer = class {
-      constructor(version, options) {
+      constructor(version2, options) {
         options = parseOptions(options);
-        if (version instanceof SemVer) {
-          if (version.loose === !!options.loose && version.includePrerelease === !!options.includePrerelease) {
-            return version;
+        if (version2 instanceof SemVer) {
+          if (version2.loose === !!options.loose && version2.includePrerelease === !!options.includePrerelease) {
+            return version2;
           } else {
-            version = version.version;
+            version2 = version2.version;
           }
-        } else if (typeof version !== "string") {
-          throw new TypeError(`Invalid Version: ${version}`);
+        } else if (typeof version2 !== "string") {
+          throw new TypeError(`Invalid Version: ${version2}`);
         }
-        if (version.length > MAX_LENGTH) {
+        if (version2.length > MAX_LENGTH) {
           throw new TypeError(`version is longer than ${MAX_LENGTH} characters`);
         }
-        debug("SemVer", version, options);
+        debug("SemVer", version2, options);
         this.options = options;
         this.loose = !!options.loose;
         this.includePrerelease = !!options.includePrerelease;
-        const m = version.trim().match(options.loose ? re[t.LOOSE] : re[t.FULL]);
+        const m = version2.trim().match(options.loose ? re[t.LOOSE] : re[t.FULL]);
         if (!m) {
-          throw new TypeError(`Invalid Version: ${version}`);
+          throw new TypeError(`Invalid Version: ${version2}`);
         }
-        this.raw = version;
+        this.raw = version2;
         this.major = +m[1];
         this.minor = +m[2];
         this.patch = +m[3];
@@ -19275,23 +19275,23 @@ var require_parse2 = __commonJS({
     var { re, t } = require_re();
     var SemVer = require_semver();
     var parseOptions = require_parse_options();
-    var parse = (version, options) => {
+    var parse = (version2, options) => {
       options = parseOptions(options);
-      if (version instanceof SemVer) {
-        return version;
+      if (version2 instanceof SemVer) {
+        return version2;
       }
-      if (typeof version !== "string") {
+      if (typeof version2 !== "string") {
         return null;
       }
-      if (version.length > MAX_LENGTH) {
+      if (version2.length > MAX_LENGTH) {
         return null;
       }
       const r = options.loose ? re[t.LOOSE] : re[t.FULL];
-      if (!r.test(version)) {
+      if (!r.test(version2)) {
         return null;
       }
       try {
-        return new SemVer(version, options);
+        return new SemVer(version2, options);
       } catch (er) {
         return null;
       }
@@ -19304,8 +19304,8 @@ var require_parse2 = __commonJS({
 var require_valid = __commonJS({
   "node_modules/semver/functions/valid.js"(exports2, module2) {
     var parse = require_parse2();
-    var valid = (version, options) => {
-      const v = parse(version, options);
+    var valid = (version2, options) => {
+      const v = parse(version2, options);
       return v ? v.version : null;
     };
     module2.exports = valid;
@@ -19316,8 +19316,8 @@ var require_valid = __commonJS({
 var require_clean = __commonJS({
   "node_modules/semver/functions/clean.js"(exports2, module2) {
     var parse = require_parse2();
-    var clean = (version, options) => {
-      const s = parse(version.trim().replace(/^[=v]+/, ""), options);
+    var clean = (version2, options) => {
+      const s = parse(version2.trim().replace(/^[=v]+/, ""), options);
       return s ? s.version : null;
     };
     module2.exports = clean;
@@ -19328,13 +19328,13 @@ var require_clean = __commonJS({
 var require_inc = __commonJS({
   "node_modules/semver/functions/inc.js"(exports2, module2) {
     var SemVer = require_semver();
-    var inc = (version, release, options, identifier2) => {
+    var inc = (version2, release, options, identifier2) => {
       if (typeof options === "string") {
         identifier2 = options;
         options = void 0;
       }
       try {
-        return new SemVer(version, options).inc(release, identifier2).version;
+        return new SemVer(version2, options).inc(release, identifier2).version;
       } catch (er) {
         return null;
       }
@@ -19420,8 +19420,8 @@ var require_patch = __commonJS({
 var require_prerelease = __commonJS({
   "node_modules/semver/functions/prerelease.js"(exports2, module2) {
     var parse = require_parse2();
-    var prerelease = (version, options) => {
-      const parsed = parse(version, options);
+    var prerelease = (version2, options) => {
+      const parsed = parse(version2, options);
       return parsed && parsed.prerelease.length ? parsed.prerelease : null;
     };
     module2.exports = prerelease;
@@ -19573,23 +19573,23 @@ var require_coerce = __commonJS({
     var SemVer = require_semver();
     var parse = require_parse2();
     var { re, t } = require_re();
-    var coerce = (version, options) => {
-      if (version instanceof SemVer) {
-        return version;
+    var coerce = (version2, options) => {
+      if (version2 instanceof SemVer) {
+        return version2;
       }
-      if (typeof version === "number") {
-        version = String(version);
+      if (typeof version2 === "number") {
+        version2 = String(version2);
       }
-      if (typeof version !== "string") {
+      if (typeof version2 !== "string") {
         return null;
       }
       options = options || {};
       let match = null;
       if (!options.rtl) {
-        match = version.match(re[t.COERCE]);
+        match = version2.match(re[t.COERCE]);
       } else {
         let next;
-        while ((next = re[t.COERCERTL].exec(version)) && (!match || match.index + match[0].length !== version.length)) {
+        while ((next = re[t.COERCERTL].exec(version2)) && (!match || match.index + match[0].length !== version2.length)) {
           if (!match || next.index + next[0].length !== match.index + match[0].length) {
             match = next;
           }
@@ -20353,19 +20353,19 @@ var require_range = __commonJS({
           });
         });
       }
-      test(version) {
-        if (!version) {
+      test(version2) {
+        if (!version2) {
           return false;
         }
-        if (typeof version === "string") {
+        if (typeof version2 === "string") {
           try {
-            version = new SemVer(version, this.options);
+            version2 = new SemVer(version2, this.options);
           } catch (er) {
             return false;
           }
         }
         for (let i = 0; i < this.set.length; i++) {
-          if (testSet(this.set[i], version, this.options)) {
+          if (testSet(this.set[i], version2, this.options)) {
             return true;
           }
         }
@@ -20579,13 +20579,13 @@ var require_range = __commonJS({
       }
       return `${from} ${to}`.trim();
     };
-    var testSet = (set, version, options) => {
+    var testSet = (set, version2, options) => {
       for (let i = 0; i < set.length; i++) {
-        if (!set[i].test(version)) {
+        if (!set[i].test(version2)) {
           return false;
         }
       }
-      if (version.prerelease.length && !options.includePrerelease) {
+      if (version2.prerelease.length && !options.includePrerelease) {
         for (let i = 0; i < set.length; i++) {
           debug(set[i].semver);
           if (set[i].semver === Comparator.ANY) {
@@ -20593,7 +20593,7 @@ var require_range = __commonJS({
           }
           if (set[i].semver.prerelease.length > 0) {
             const allowed = set[i].semver;
-            if (allowed.major === version.major && allowed.minor === version.minor && allowed.patch === version.patch) {
+            if (allowed.major === version2.major && allowed.minor === version2.minor && allowed.patch === version2.patch) {
               return true;
             }
           }
@@ -20652,19 +20652,19 @@ var require_comparator = __commonJS({
       toString() {
         return this.value;
       }
-      test(version) {
-        debug("Comparator.test", version, this.options.loose);
-        if (this.semver === ANY || version === ANY) {
+      test(version2) {
+        debug("Comparator.test", version2, this.options.loose);
+        if (this.semver === ANY || version2 === ANY) {
           return true;
         }
-        if (typeof version === "string") {
+        if (typeof version2 === "string") {
           try {
-            version = new SemVer(version, this.options);
+            version2 = new SemVer(version2, this.options);
           } catch (er) {
             return false;
           }
         }
-        return cmp(version, this.operator, this.semver, this.options);
+        return cmp(version2, this.operator, this.semver, this.options);
       }
       intersects(comp, options) {
         if (!(comp instanceof Comparator)) {
@@ -20710,13 +20710,13 @@ var require_comparator = __commonJS({
 var require_satisfies = __commonJS({
   "node_modules/semver/functions/satisfies.js"(exports2, module2) {
     var Range = require_range();
-    var satisfies = (version, range, options) => {
+    var satisfies = (version2, range, options) => {
       try {
         range = new Range(range, options);
       } catch (er) {
         return false;
       }
-      return range.test(version);
+      return range.test(version2);
     };
     module2.exports = satisfies;
   }
@@ -20869,8 +20869,8 @@ var require_outside = __commonJS({
     var lt = require_lt();
     var lte = require_lte();
     var gte = require_gte();
-    var outside = (version, range, hilo, options) => {
-      version = new SemVer(version, options);
+    var outside = (version2, range, hilo, options) => {
+      version2 = new SemVer(version2, options);
       range = new Range(range, options);
       let gtfn, ltefn, ltfn, comp, ecomp;
       switch (hilo) {
@@ -20891,7 +20891,7 @@ var require_outside = __commonJS({
         default:
           throw new TypeError('Must provide a hilo val of "<" or ">"');
       }
-      if (satisfies(version, range, options)) {
+      if (satisfies(version2, range, options)) {
         return false;
       }
       for (let i = 0; i < range.set.length; ++i) {
@@ -20913,9 +20913,9 @@ var require_outside = __commonJS({
         if (high.operator === comp || high.operator === ecomp) {
           return false;
         }
-        if ((!low.operator || low.operator === comp) && ltefn(version, low.semver)) {
+        if ((!low.operator || low.operator === comp) && ltefn(version2, low.semver)) {
           return false;
-        } else if (low.operator === ecomp && ltfn(version, low.semver)) {
+        } else if (low.operator === ecomp && ltfn(version2, low.semver)) {
           return false;
         }
       }
@@ -20929,7 +20929,7 @@ var require_outside = __commonJS({
 var require_gtr = __commonJS({
   "node_modules/semver/ranges/gtr.js"(exports2, module2) {
     var outside = require_outside();
-    var gtr = (version, range, options) => outside(version, range, ">", options);
+    var gtr = (version2, range, options) => outside(version2, range, ">", options);
     module2.exports = gtr;
   }
 });
@@ -20938,7 +20938,7 @@ var require_gtr = __commonJS({
 var require_ltr = __commonJS({
   "node_modules/semver/ranges/ltr.js"(exports2, module2) {
     var outside = require_outside();
-    var ltr = (version, range, options) => outside(version, range, "<", options);
+    var ltr = (version2, range, options) => outside(version2, range, "<", options);
     module2.exports = ltr;
   }
 });
@@ -20966,12 +20966,12 @@ var require_simplify = __commonJS({
       let min = null;
       let prev = null;
       const v = versions.sort((a, b) => compare(a, b, options));
-      for (const version of v) {
-        const included = satisfies(version, range, options);
+      for (const version2 of v) {
+        const included = satisfies(version2, range, options);
         if (included) {
-          prev = version;
+          prev = version2;
           if (!min)
-            min = version;
+            min = version2;
         } else {
           if (prev) {
             set.push([min, prev]);
@@ -23612,29 +23612,29 @@ var require_semver_store = __commonJS({
       }
       this.tree = new Node();
     }
-    SemVerStore.prototype.set = function(version, store) {
-      if (typeof version !== "string") {
+    SemVerStore.prototype.set = function(version2, store) {
+      if (typeof version2 !== "string") {
         throw new TypeError("Version should be a string");
       }
       var currentNode = this.tree;
-      version = version.split(".");
-      while (version.length) {
-        currentNode = currentNode.addChild(new Node(version.shift()));
+      version2 = version2.split(".");
+      while (version2.length) {
+        currentNode = currentNode.addChild(new Node(version2.shift()));
       }
       currentNode.setStore(store);
       return this;
     };
-    SemVerStore.prototype.get = function(version) {
-      if (typeof version !== "string")
+    SemVerStore.prototype.get = function(version2) {
+      if (typeof version2 !== "string")
         return null;
-      if (version === "*")
-        version = "x.x.x";
+      if (version2 === "*")
+        version2 = "x.x.x";
       var node = this.tree;
-      var firstDot = version.indexOf(".");
-      var secondDot = version.indexOf(".", firstDot + 1);
-      var major = version.slice(0, firstDot);
-      var minor = secondDot === -1 ? version.slice(firstDot + 1) : version.slice(firstDot + 1, secondDot);
-      var patch = secondDot === -1 ? "x" : version.slice(secondDot + 1);
+      var firstDot = version2.indexOf(".");
+      var secondDot = version2.indexOf(".", firstDot + 1);
+      var major = version2.slice(0, firstDot);
+      var minor = secondDot === -1 ? version2.slice(firstDot + 1) : version2.slice(firstDot + 1, secondDot);
+      var patch = secondDot === -1 ? "x" : version2.slice(secondDot + 1);
       node = node.getChild(major);
       if (node === null)
         return null;
@@ -23646,15 +23646,15 @@ var require_semver_store = __commonJS({
         return null;
       return node.store;
     };
-    SemVerStore.prototype.del = function(version) {
-      if (typeof version !== "string") {
+    SemVerStore.prototype.del = function(version2) {
+      if (typeof version2 !== "string") {
         throw new TypeError("Version should be a string");
       }
-      var firstDot = version.indexOf(".");
-      var secondDot = version.indexOf(".", firstDot + 1);
-      var major = version.slice(0, firstDot);
-      var minor = secondDot === -1 ? version.slice(firstDot + 1) : version.slice(firstDot + 1, secondDot);
-      var patch = secondDot === -1 ? "x" : version.slice(secondDot + 1);
+      var firstDot = version2.indexOf(".");
+      var secondDot = version2.indexOf(".", firstDot + 1);
+      var major = version2.slice(0, firstDot);
+      var minor = secondDot === -1 ? version2.slice(firstDot + 1) : version2.slice(firstDot + 1, secondDot);
+      var patch = secondDot === -1 ? "x" : version2.slice(secondDot + 1);
       var majorNode = this.tree.children[major];
       if (majorNode == null)
         return this;
@@ -26874,7 +26874,7 @@ var require_fastify = __commonJS({
     var http2 = require("http");
     var querystring = require("querystring");
     var lightMyRequest;
-    var version;
+    var version2;
     var versionLoaded = false;
     var {
       kAvvioBoot,
@@ -27123,9 +27123,9 @@ var require_fastify = __commonJS({
         version: {
           get() {
             if (versionLoaded === false) {
-              version = loadVersion();
+              version2 = loadVersion();
             }
-            return version;
+            return version2;
           }
         },
         errorHandler: {
@@ -31510,8 +31510,8 @@ var require_register = __commonJS({
       if (implementation) {
         return implementation === "global.Promise";
       } else if (typeof global.Promise !== "undefined") {
-        var version = /v(\d+)\.(\d+)\.(\d+)/.exec(process.version);
-        return !(version && +version[1] == 0 && +version[2] < 12);
+        var version2 = /v(\d+)\.(\d+)\.(\d+)/.exec(process.version);
+        return !(version2 && +version2[1] == 0 && +version2[2] < 12);
       }
       return false;
     }
@@ -39672,12 +39672,12 @@ var require_isIP = __commonJS({
     var ipv4Maybe = /^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/;
     var ipv6Block = /^[0-9A-F]{1,4}$/i;
     function isIP(str) {
-      var version = arguments.length > 1 && arguments[1] !== void 0 ? arguments[1] : "";
+      var version2 = arguments.length > 1 && arguments[1] !== void 0 ? arguments[1] : "";
       (0, _assertString.default)(str);
-      version = String(version);
-      if (!version) {
+      version2 = String(version2);
+      if (!version2) {
         return isIP(str, 4) || isIP(str, 6);
-      } else if (version === "4") {
+      } else if (version2 === "4") {
         if (!ipv4Maybe.test(str)) {
           return false;
         }
@@ -39685,7 +39685,7 @@ var require_isIP = __commonJS({
           return a - b;
         });
         return parts[3] <= 255;
-      } else if (version === "6") {
+      } else if (version2 === "6") {
         var blocks = str.split(":");
         var foundOmissionBlock = false;
         var foundIPv4TransitionBlock = isIP(blocks[blocks.length - 1], 4);
@@ -40824,9 +40824,9 @@ var require_isUUID = __commonJS({
       all: /^[0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{12}$/i
     };
     function isUUID(str) {
-      var version = arguments.length > 1 && arguments[1] !== void 0 ? arguments[1] : "all";
+      var version2 = arguments.length > 1 && arguments[1] !== void 0 ? arguments[1] : "all";
       (0, _assertString.default)(str);
-      var pattern = uuid[version];
+      var pattern = uuid[version2];
       return pattern && pattern.test(str);
     }
     module2.exports = exports2.default;
@@ -41117,16 +41117,16 @@ var require_isISBN = __commonJS({
     var isbn13Maybe = /^(?:[0-9]{13})$/;
     var factor = [1, 3];
     function isISBN(str) {
-      var version = arguments.length > 1 && arguments[1] !== void 0 ? arguments[1] : "";
+      var version2 = arguments.length > 1 && arguments[1] !== void 0 ? arguments[1] : "";
       (0, _assertString.default)(str);
-      version = String(version);
-      if (!version) {
+      version2 = String(version2);
+      if (!version2) {
         return isISBN(str, 10) || isISBN(str, 13);
       }
       var sanitized = str.replace(/[\s-]+/g, "");
       var checksum = 0;
       var i;
-      if (version === "10") {
+      if (version2 === "10") {
         if (!isbn10Maybe.test(sanitized)) {
           return false;
         }
@@ -41141,7 +41141,7 @@ var require_isISBN = __commonJS({
         if (checksum % 11 === 0) {
           return !!sanitized;
         }
-      } else if (version === "13") {
+      } else if (version2 === "13") {
         if (!isbn13Maybe.test(sanitized)) {
           return false;
         }
@@ -42167,9 +42167,9 @@ var require_validator2 = __commonJS({
     function _interopRequireDefault(obj) {
       return obj && obj.__esModule ? obj : { default: obj };
     }
-    var version = "10.11.0";
+    var version2 = "10.11.0";
     var validator = {
-      version,
+      version: version2,
       toDate: _toDate.default,
       toFloat: _toFloat.default,
       toInt: _toInt.default,
@@ -50456,7 +50456,7 @@ var require_v35 = __commonJS({
     exports2.DNS = DNS;
     var URL = "6ba7b811-9dad-11d1-80b4-00c04fd430c8";
     exports2.URL = URL;
-    function _default(name, version, hashfunc) {
+    function _default(name, version2, hashfunc) {
       function generateUUID(value, namespace, buf, offset) {
         if (typeof value === "string") {
           value = stringToBytes(value);
@@ -50471,7 +50471,7 @@ var require_v35 = __commonJS({
         bytes.set(namespace);
         bytes.set(value, namespace.length);
         bytes = hashfunc(bytes);
-        bytes[6] = bytes[6] & 15 | version;
+        bytes[6] = bytes[6] & 15 | version2;
         bytes[8] = bytes[8] & 63 | 128;
         if (buf) {
           offset = offset || 0;
@@ -50638,13 +50638,13 @@ var require_version = __commonJS({
     function _interopRequireDefault(obj) {
       return obj && obj.__esModule ? obj : { default: obj };
     }
-    function version(uuid) {
+    function version2(uuid) {
       if (!(0, _validate.default)(uuid)) {
         throw TypeError("Invalid UUID");
       }
       return parseInt(uuid.substr(14, 1), 16);
     }
-    var _default = version;
+    var _default = version2;
     exports2.default = _default;
   }
 });
@@ -57451,8 +57451,8 @@ var require_connection_manager = __commonJS({
                 };
                 _options.logging.__testLoggingFn = true;
                 if (this.sequelize.options.databaseVersion === 0) {
-                  const version = await this.sequelize.databaseVersion(_options);
-                  const parsedVersion = _.get(semver.coerce(version), "version") || version;
+                  const version2 = await this.sequelize.databaseVersion(_options);
+                  const parsedVersion = _.get(semver.coerce(version2), "version") || version2;
                   this.sequelize.options.databaseVersion = semver.valid(parsedVersion) ? parsedVersion : this.dialect.defaultVersion;
                 }
                 if (semver.lt(this.sequelize.options.databaseVersion, this.dialect.defaultVersion)) {
@@ -63583,8 +63583,8 @@ var require_connection_manager5 = __commonJS({
             switch (message.parameterName) {
               case "server_version":
                 if (this.sequelize.options.databaseVersion === 0) {
-                  const version = semver.coerce(message.parameterValue).version;
-                  this.sequelize.options.databaseVersion = semver.valid(version) ? version : this.dialect.defaultVersion;
+                  const version2 = semver.coerce(message.parameterValue).version;
+                  this.sequelize.options.databaseVersion = semver.valid(version2) ? version2 : this.dialect.defaultVersion;
                 }
                 break;
               case "standard_conforming_strings":
@@ -87545,10 +87545,10 @@ var require_supports_color2 = __commonJS({
         return 3;
       }
       if ("TERM_PROGRAM" in env) {
-        const version = parseInt((env.TERM_PROGRAM_VERSION || "").split(".")[0], 10);
+        const version2 = parseInt((env.TERM_PROGRAM_VERSION || "").split(".")[0], 10);
         switch (env.TERM_PROGRAM) {
           case "iTerm.app":
-            return version >= 3 ? 3 : 2;
+            return version2 >= 3 ? 3 : 2;
           case "Apple_Terminal":
             return 2;
         }
@@ -91147,6 +91147,74 @@ var require_authRoutes = __commonJS({
   }
 });
 
+// package.json
+var require_package3 = __commonJS({
+  "package.json"(exports2, module2) {
+    module2.exports = {
+      name: "steds-apollo",
+      version: "0.1.0",
+      private: true,
+      dependencies: {
+        bcryptjs: "^2.4.3",
+        chalk: "^4.0.0",
+        clear: "^0.1.0",
+        "date-fns": "^2.12.0",
+        dotenv: "^10.0.0",
+        "eslint-plugin-node": "^11.1.0",
+        "event-iterator": "^2.0.0",
+        fastify: "^3.15.1",
+        "fastify-cookie": "^5.3.1",
+        "fastify-cors": "^6.0.1",
+        "fastify-file-upload": "^3.0.0",
+        "fastify-multipart": "^4.0.6",
+        "fastify-secure-session": "^2.3.1",
+        "fastify-sse-v2": "^2.0.4",
+        "fastify-static": "^4.0.1",
+        "fastify-warning": "^0.2.0",
+        figlet: "^1.4.0",
+        "fs-jetpack": "^4.1.0",
+        getenv: "^1.0.0",
+        lodash: "^4.17.15",
+        nodemon: "^2.0.7",
+        sequelize: "^6.6.2",
+        "sequelize-cli": "^6.2.0",
+        "sprintf-js": "^1.1.2",
+        sqlite3: "^5.0.2",
+        ws: "^7.2.5"
+      },
+      scripts: {
+        server: "node ./src/server/index.js",
+        deadfile: "./deadfile.sh",
+        dev: "parcel src/server/index.js",
+        build: "node build.js"
+      },
+      browserslist: {
+        production: [
+          ">0.2%",
+          "not dead",
+          "not op_mini all"
+        ],
+        development: [
+          "last 1 chrome version",
+          "last 1 firefox version",
+          "last 1 safari version"
+        ]
+      },
+      type: "commonjs",
+      engines: {
+        node: ">=12.1.0"
+      },
+      devDependencies: {
+        deadfile: "^1.2.2",
+        esbuild: "^0.12.11",
+        eslint: "^7.28.0",
+        "eslint-config-prettier": "^8.3.0",
+        "eslint-plugin-prettier": "^3.4.0"
+      }
+    };
+  }
+});
+
 // node_modules/fastify-sse-v2/node_modules/fastify-plugin/stackParser.js
 var require_stackParser2 = __commonJS({
   "node_modules/fastify-sse-v2/node_modules/fastify-plugin/stackParser.js"(exports2, module2) {
@@ -91161,7 +91229,7 @@ var require_stackParser2 = __commonJS({
 });
 
 // node_modules/fastify/package.json
-var require_package3 = __commonJS({
+var require_package4 = __commonJS({
   "node_modules/fastify/package.json"(exports2, module2) {
     module2.exports = {
       name: "fastify",
@@ -91415,18 +91483,18 @@ var require_plugin4 = __commonJS({
         return extractPluginName(e.stack);
       }
     }
-    function checkVersion(version, pluginName) {
-      if (typeof version !== "string") {
-        throw new TypeError(`fastify-plugin expects a version string, instead got '${typeof version}'`);
+    function checkVersion(version2, pluginName) {
+      if (typeof version2 !== "string") {
+        throw new TypeError(`fastify-plugin expects a version string, instead got '${typeof version2}'`);
       }
       var fastifyVersion;
       try {
-        fastifyVersion = semver.coerce(require_package3().version);
+        fastifyVersion = semver.coerce(require_package4().version);
       } catch (_) {
         console2.info("fastify not found, proceeding anyway");
       }
-      if (fastifyVersion && !semver.satisfies(fastifyVersion, version)) {
-        throw new Error(`fastify-plugin: ${pluginName} - expected '${version}' fastify version, '${fastifyVersion}' is installed`);
+      if (fastifyVersion && !semver.satisfies(fastifyVersion, version2)) {
+        throw new Error(`fastify-plugin: ${pluginName} - expected '${version2}' fastify version, '${fastifyVersion}' is installed`);
       }
     }
     module2.exports = plugin;
@@ -91793,6 +91861,8 @@ var multipart = require_fastify_multipart();
 var { eventEmitter, on } = require_eventEmitter();
 var bookingsRoutes = require_bookingsRoutes();
 var { authRoutes } = require_authRoutes();
+var packageJson = require_package3();
+var version = packageJson.version;
 var http = require("http");
 console.log("loading");
 var sitePrefix = "bookingsServer/";
@@ -91868,7 +91938,7 @@ var runit = async () => {
     fastify.log.error(err);
     process.exit(1);
   }
-  console.log(`listening on ${JSON.stringify(fastify.server.address())}:${fastify.server.address().port}`);
+  console.log(`version:${version}. Listening on ${JSON.stringify(fastify.server.address())}:${fastify.server.address().port}`);
 };
 runit();
 /*!

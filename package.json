@@ -34,7 +34,7 @@
     "server": "node ./src/server/index.js",
     "deadfile": "./deadfile.sh",
     "dev": "parcel src/server/index.js",
-    "build": "esbuild server/index.js --bundle --platform=node --target=node12.2 --outdir=dist"
+    "build": "node build.js"
   },
   "browserslist": {
     "production": [

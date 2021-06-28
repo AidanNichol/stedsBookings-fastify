@@ -2,7 +2,7 @@ require('esbuild')
   .build({
     entryPoints: ['server/index.js'],
     platform: 'node',
-    target: 'node12.2',
+    target: 'node12.14',
     bundle: true,
     outdir: 'dist',
     external: ['pg-hstore'],
