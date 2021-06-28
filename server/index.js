@@ -8,6 +8,8 @@ var { eventEmitter, on } = require('./eventEmitter');
 
 const bookingsRoutes = require('./routes/bookings/bookingsRoutes.js');
 const { authRoutes } = require('./routes/authRoutes.js');
+const packageJson = require('../package.json');
+const version = packageJson.version;
 
 // const getEnv = require('getenv');
 // const path = require('path');
@@ -135,7 +137,7 @@ const runit = async () => {
     process.exit(1);
   }
   console.log(
-    `listening on ${JSON.stringify(fastify.server.address())}:${
+    `version:${version}. Listening on ${JSON.stringify(fastify.server.address())}:${
       fastify.server.address().port
     }`,
   );

@@ -34,7 +34,7 @@
     "server": "node ./src/server/index.js",
     "deadfile": "./deadfile.sh",
     "dev": "parcel src/server/index.js",
-    "build": "pkg src/server/index.js"
+    "build": "esbuild server/index.js --bundle --platform=node --target=node12.2 --outdir=dist"
   },
   "browserslist": {
     "production": [
@@ -54,6 +54,7 @@
   },
   "devDependencies": {
     "deadfile": "^1.2.2",
+    "esbuild": "^0.12.11",
     "eslint": "^7.28.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^3.4.0"
