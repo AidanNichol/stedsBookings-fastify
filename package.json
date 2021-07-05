@@ -1,7 +1,16 @@
 {
-  "name": "steds-apollo",
-  "version": "0.1.0",
+  "name": "steds-booking-fastify",
+  "version": "0.1.1",
   "private": true,
+  "default": "dist/index.js",
+  "targets": {
+    "default": {
+      "includeNodeModules": true
+    }
+  },
+  "engines": {
+    "node": "12"
+  },
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "chalk": "^4.0.0",
@@ -23,7 +32,6 @@
     "fs-jetpack": "^4.1.0",
     "getenv": "^1.0.0",
     "lodash": "^4.17.15",
-    "nodemon": "^2.0.7",
     "sequelize": "^6.6.2",
     "sequelize-cli": "^6.2.0",
     "sprintf-js": "^1.1.2",
@@ -33,8 +41,13 @@
   "scripts": {
     "server": "node ./src/server/index.js",
     "deadfile": "./deadfile.sh",
-    "dev": "parcel src/server/index.js",
-    "build": "node build.js"
+    "servertest": "sirv dist/index.js",
+    "build": "node build.js",
+    "rollup2": "rollup server/index.js --file dist/index.js --format cjs ",
+    "rollup": "rollup --config rollup.config.js ",
+    "parcel": "parcel build server/index.js",
+    "build2": "esbuild server/index.js --bundle --platform=node --target=node12.14 --outdir=dist --format=cjs --external:pg-hstore",
+    "deploy": "clear && yarn version --patch && node -r dotenv/config deploy.mjs"
   },
   "browserslist": {
     "production": [
@@ -48,15 +61,19 @@
       "last 1 safari version"
     ]
   },
-  "type": "commonjs",
-  "engines": {
-    "node": ">=12.1.0"
-  },
   "devDependencies": {
+    "@rollup/plugin-commonjs": "^19.0.0",
+    "@rollup/plugin-json": "^4.1.0",
+    "@rollup/plugin-node-resolve": "^13.0.0",
+    "basic-ftp": "^4.6.6",
     "deadfile": "^1.2.2",
-    "esbuild": "^0.12.11",
     "eslint": "^7.28.0",
     "eslint-config-prettier": "^8.3.0",
-    "eslint-plugin-prettier": "^3.4.0"
+    "eslint-plugin-prettier": "^3.4.0",
+    "log-update": "^4.0.0",
+    "nodemon": "^2.0.9"
+  },
+  "volta": {
+    "node": "12.22.1"
   }
 }
