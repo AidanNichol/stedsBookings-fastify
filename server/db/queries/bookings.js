@@ -1,5 +1,5 @@
 const models = require('../../../models');
-const { todaysDate: today } = require('../../../junk/scopes/dateFns');
+const { todaysDate: today } = require('../../routes/bookings/dateFns');
 const _ = require('lodash');
 const command = {
   status: { table: 'Walk', scope: ['active', 'bookingCount'] },
@@ -164,7 +164,7 @@ function fp(item) {
   return JSON.parse(JSON.stringify(item));
 }
 async function getCommand(params) {
-  const { table, scope, postProcess } = command[params.cmd] ?? {};
+  const { table, scope, postProcess } = command[params.cmd] || {};
   console.log('getCommand', table, scope, params);
   let res = await models[table].scope(scope).findAll();
   if (postProcess) res = postProcess(res);
