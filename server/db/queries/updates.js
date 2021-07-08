@@ -148,4 +148,8 @@ const processMembers = async (op, path, value, memberId, item, t) => {
       );
       break;
   }
+  eventEmitter.emit('change_event', {
+    event: 'memberChange',
+    memberId,
+  });
 };
