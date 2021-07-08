@@ -1,4 +1,5 @@
 import ftp from 'basic-ftp';
+import getenv from 'getenv';
 import logUpdate from 'log-update';
 
 example();
@@ -7,10 +8,6 @@ async function example() {
   const client = new ftp.Client();
   let last = '';
   client.trackProgress((info) => {
-    // console.log('File', info.name);
-    // console.log('Type', info.type);
-    // console.log('Transferred', info.bytes);
-    // console.log('Transferred Overall', info.bytesOverall);
     if (last !== info.name) {
       logUpdate.done();
       last = info.name;
@@ -22,7 +19,7 @@ async function example() {
     await client.access({
       host: 'ftp.stedwardsfellwalkers.co.uk',
       user: 'vscode@stedwardsfellwalkers.co.uk',
-      password: 'SN5eaR!434QM5cmx',
+      password: getenv('FTPPASSWORD'),
       secure: true,
       port: 21,
       secureOptions: { servername: 'ukhost4u.com' },
