@@ -39,7 +39,8 @@ const Member = {
   memNo: {
     type: DataTypes.VIRTUAL,
     get() {
-      return parseInt(this.memberId?.substr(1));
+      if (!this.memberId) return null;
+      return parseInt(this.memberId.substr(1));
     },
     set() {
       throw new Error('Do not try to set the `memNo` value!');

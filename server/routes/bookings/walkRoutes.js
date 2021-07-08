@@ -4,13 +4,10 @@ const models = require('../../../models');
 const { todaysDate: today } = require('./dateFns');
 
 const _ = require('lodash');
-// var { EventEmitter, on } = require('events');
 
 // Create an eventEmitter object
-var { eventEmitter, on } = require('../../eventEmitter');
-// var eventEmitter = new EventEmitter();
 
-// Create an eventEmitter object
+var { eventEmitter } = require('../../eventEmitter');
 
 async function walkRoutes(fastify) {
   // fastify.get(``, async (request, reply) => {
@@ -53,20 +50,6 @@ async function walkRoutes(fastify) {
   fastify.get(`/bookingCount`, async () => {
     return bookingCount();
   });
-  fastify.get('/monitorBookingCount', (request, reply) => {
-    console.log('monitorBookingCount activated');
-    reply.sse(
-      (async function* () {
-        for await (const data of on(eventEmitter, 'refreshBookingCount')) {
-          // console.log('yielding', data);
-          yield {
-            id: 'refreshBookingCount',
-            data: JSON.stringify(data.pop()),
-          };
-        }
-      })(),
-    );
-  });
 }
 module.exports = { walkRoutes, refreshBookingCount };
 let timeoutId;
@@ -76,7 +59,7 @@ function refreshBookingCount() {
     console.log('refreshing', 'BookingCount');
     let data = await bookingCount();
     // console.log('emmitting', data);
-    eventEmitter.emit('change_event', { id: 'refreshBookingCount', ...data });
+    eventEmitter.emit('change_event', { event: 'refreshBookingCount', ...data });
     timeoutId = null;
   }, 100);
 }
@@ -179,7 +162,7 @@ async function walkdayData() {
       },
     ],
   });
-  current = fp(current);
+  current = current.get({ plain: true });
   return current;
 }
 
@@ -216,7 +199,4 @@ function numberWL(data) {
     console.log('wait', wait, WLindex);
   });
   return [WLindex];
-}
-function fp(item) {
-  return item?.get?.({ plain: true }) ?? item;
 }

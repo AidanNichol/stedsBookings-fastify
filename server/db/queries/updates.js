@@ -40,7 +40,7 @@ module.exports.withPatches = async (patches) => {
       }
       if (table === 'Booking') {
         refreshBookingCount();
-        memberId = value?.bookingId?.substr(11);
+        memberId = value && value.bookingId && value.bookingId.substr(11);
       }
       payments = payments || table === 'Allocation';
       if (op === 'add' && table === 'Payment') {
@@ -98,16 +98,12 @@ function bookingChanged(memberId, accountId, payments) {
   if (!memberId && !accountId) return;
   console.log(' emiting: bookingChange', { memberId, accountId, payments });
   eventEmitter.emit('change_event', {
-    id: 'bookingChange',
+    event: 'bookingChange',
     memberId,
     accountId,
     payments,
   });
 }
-// function paymentChanged(accountId) {
-//   console.log(' emiting: paymentChange', accountId);
-//   eventEmitter.emit('change_event', { id: 'paymentChange', data: { accountId } });
-// }
 const createItem = async (op, path, value, table, key, item, t) => {
   console.log(`createItem ${op} ${table}`, value);
   if (_.isArray(value)) {
@@ -136,29 +132,12 @@ const processMembers = async (op, path, value, memberId, item, t) => {
           });
         }
       } else {
-        // console.log('member field update', { [item]: value });
         await models.Member.update(
           { [item]: value },
           { where: { memberId: memberId }, transaction: t },
         );
       }
       refreshMemberIndex(memberId);
-      // const data = await models.Member.findByPk(key, {attributes: [
-      //   ['memberId', 'id'],
-      //   'memberId',
-      //   'memNo',
-      //   'firstName',
-      //   'lastName',
-      //   'shortName',
-      //   'memberStatus',
-      //   'subscription',
-      //   'fullName',
-      //   'sortName',
-      //   'accountId',
-      //   'subsStatus',
-      // ],});
-      // console.log('index data', data);
-      // broadcast({ type: 'member', data });
       break;
     default:
       console.log('member  default update', { [item]: value });

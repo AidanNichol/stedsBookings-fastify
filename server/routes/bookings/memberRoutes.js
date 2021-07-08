@@ -72,7 +72,7 @@ function refreshMemberIndex(memberId) {
     // console.log('emmitting', data);
     data = data.get({ plain: true });
     delete data.id;
-    eventEmitter.emit('change_event', { id: 'refreshMemberIndex', ...data });
+    eventEmitter.emit('change_event', { event: 'refreshMemberIndex', ...data });
     timeoutId = null;
   }, 100);
 }

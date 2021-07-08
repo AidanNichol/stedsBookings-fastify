@@ -1,7 +1,5 @@
 const { Op } = require('sequelize');
 const models = require('../../../models');
-// const { todaysDate: today } = require('../../../models/scopes/dateFns');
-// const _ = require('lodash');
 
 async function accountRoutes(fastify) {
   fastify.get(`/index`, async () => {
@@ -15,11 +13,6 @@ async function accountRoutes(fastify) {
       ],
     });
   });
-  // fastify.get(`/activeData/:accountId/:startDate`, async (req, reply) => {
-  //   const data = await activeData(req.params);
-
-  //   return data;
-  // });
 
   fastify.get(`/activeBookings/:accountId/:startDate`, async (req) => {
     const account = await bookingsData({ ...req.params, endDate: 'active' });
@@ -29,11 +22,7 @@ async function accountRoutes(fastify) {
     const payments = await paymentsData(req.params);
     return payments;
   });
-  // fastify.get(`/historicData/:accountId/:startDate/:endDate`, async (req, reply) => {
-  //   const data = await historicData(req.params);
 
-  //   return data;
-  // });
   fastify.get(`/bookingsData/:accountId/:startDate/:endDate`, async (req) => {
     const bookings = await bookingsData(req.params);
 
@@ -44,10 +33,6 @@ async function accountRoutes(fastify) {
 
     return payments;
   });
-  // fastify.get(`/creditsOwed`, async (req, reply) => {
-  //   let res = 'routed';
-  //   return res;
-  // });
 
   fastify.get(`/creditsOwed`, async () => {
     let res = await models.Payment.findAll({
@@ -78,7 +63,6 @@ async function accountRoutes(fastify) {
         },
       ],
     });
-    // let res='routed'
     return res;
   });
 }
@@ -118,10 +102,6 @@ async function bookingsData({ accountId, startDate, endDate }) {
             order: ['walkId'],
             where,
             include: [
-              // {
-              //   model: models.Walk,
-              //   attributes: ['venue', 'fee', 'bookable', 'firstBooking', 'closed'],
-              // },
               {
                 model: models.BookingLog,
                 attributes: ['id', 'req', 'dat', 'fee', 'late'],
@@ -142,18 +122,6 @@ async function bookingsData({ accountId, startDate, endDate }) {
   res = res.get({ plain: true });
   console.log('bookingsData', res);
   return res;
-  // } catch (error) {
-  //   let { message, name, DatabaseError, sql, stack } = error;
-
-  //   console.error('error in query: historicBookings', {
-  //     message,
-  //     name,
-  //     DatabaseError,
-  //     sql,
-  //     stack,
-  //   });
-  //   throw new Error({ message, name, DatabaseError });
-  // }
 }
 async function paymentsData({ accountId, startDate }) {
   let res = await models.Account.findByPk(accountId, {
@@ -186,110 +154,3 @@ async function paymentsData({ accountId, startDate }) {
   res = res.get({ plain: true });
   return res;
 }
-// async function activeData2({ accountId, startDate }) {
-//   // try {
-//   console.log('activeData', { accountId, startDate });
-//   const bookings = await bookingsData({ accountId, startDate, endDate: 'active' });
-//   const payments = await paymentsData({ accountId, startDate });
-//   const account = { bookings, payments };
-//   return account;
-//   // } catch (error) {
-//   //   let { message, name, DatabaseError, sql } = error;
-
-//   //   console.error('error in query: activeData', { message, name, DatabaseError, sql });
-//   //   return { error: { message, name, DatabaseError } };
-//   // }
-// }
-// async function activeBookings({ accountId, startDate }) {
-//   // try {
-//   console.log('activeData', { accountId, startDate });
-//   const bookings = await bookingsData({ accountId, startDate, endDate: 'active' });
-
-//   return account;
-//   // } catch (error) {
-//   //   let { message, name, DatabaseError, sql } = error;
-
-//   //   console.error('error in query: activeData', { message, name, DatabaseError, sql });
-//   //   return { error: { message, name, DatabaseError } };
-//   // }
-// }
-// async function activeData2({ accountId, startDate }) {
-//   // try {
-//   console.log('activeData', { accountId, startDate });
-//   const bookings = await bookingsData({ accountId, startDate, endDate: 'active' });
-//   const payments = await paymentsData({ accountId, startDate });
-//   const account = { bookings, payments };
-//   return account;
-//   // } catch (error) {
-//   //   let { message, name, DatabaseError, sql } = error;
-
-//   //   console.error('error in query: activeData', { message, name, DatabaseError, sql });
-//   //   return { error: { message, name, DatabaseError } };
-//   // }
-// }
-// async function activeData({ accountId, startDate }) {
-//   try {
-//     console.log('activeData', { accountId, startDate });
-//     const historic = await historicData({ accountId, startDate });
-//     const current = await currentData({ accountId, startDate });
-//     const account = { ...fp(historic), ...current };
-//     return account;
-//   } catch (error) {
-//     let { message, name, DatabaseError, sql } = error;
-
-//     console.error('error in query: activeData', { message, name, DatabaseError, sql });
-//     return { error: { message, name, DatabaseError } };
-//   }
-// }
-// async function historicData({ accountId, startDate, endDate }) {
-//   try {
-//     console.log('historicData', { accountId, startDate, endDate });
-//     const scope = { method: ['historicData', startDate, endDate] };
-//     let res = await models.Account.scope(scope).findByPk(accountId);
-//     console.log('historicData', res);
-//     return res;
-//   } catch (error) {
-//     let { message, name, DatabaseError, sql, stack } = error;
-
-//     console.error('error in query: historicData', {
-//       message,
-//       name,
-//       DatabaseError,
-//       sql,
-//       stack,
-//     });
-//     throw new Error({ message, name, DatabaseError });
-//   }
-// }
-// async function currentData({ accountId, startDate }) {
-//   try {
-//     console.log('currentData', { accountId, startDate });
-//     const scope = { method: ['currentData', startDate] };
-//     let current = await models.Account.scope(scope).findByPk(accountId);
-//     // const current2 = fp(current);
-//     current = current.get({ plain: true });
-//     console.log('currentData returned', current);
-//     current.Bookings = current.Members.reduce((arr, m) => {
-//       let bookings = m.Bookings;
-//       bookings.forEach((b) => {
-//         b.BookingLogs.forEach((log) => {
-//           log.name = m.shortName;
-//           log.venue = b.Walk.venue;
-//           if (b.fee === 0) log.fee = 0;
-//         });
-//       });
-//       delete m.Bookings;
-//       return [...arr, ...bookings];
-//     }, []);
-//     console.log('currentData', current);
-//     return current;
-//   } catch (error) {
-//     let { message, name, stack } = error;
-
-//     console.error('error in query: currentData', { message, name, stack });
-//     throw new Error({ query: 'currentData', message, name, stack });
-//   }
-// }
-// function fp(item) {
-//   return JSON.parse(JSON.stringify(item));
-// }

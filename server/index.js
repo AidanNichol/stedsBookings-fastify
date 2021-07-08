@@ -11,18 +11,11 @@ const { authRoutes } = require('./routes/authRoutes.js');
 const packageJson = require('../package.json');
 const version = packageJson.version;
 
-// const getEnv = require('getenv');
-// const path = require('path');
-// const jetpack = require('fs-jetpack');
-// const getenv = require('getenv');
 const http = require('http');
-// const { cwd, read } = jetpack;
 // const { promisify } = require('util');
 // const sleep = promisify(setTimeout);
 console.log('loading');
-// const fs = require('fs');
-const sitePrefix = 'bookingsServer/';
-// const sitePrefix = getenv('SITE_PREFIX', '');
+const sitePrefix = 'bookingsServer';
 const serverFactory = (handler) => {
   const server = http.createServer((req, res) => {
     handler(req, res);
@@ -31,14 +24,6 @@ const serverFactory = (handler) => {
   return server;
 };
 
-// const https = getenv.bool('DEVELOPMENT', false)
-//    {
-//       https: {
-//         key: read('./server.key'),
-//         cert: read('./server.crt'),
-//       },
-//     }
-//   : {};
 const fastify = fastifyPkg({
   serverFactory,
   logger: {
@@ -46,11 +31,7 @@ const fastify = fastifyPkg({
     file: './logs/fastify.log', // will use pino.destination()
   },
 });
-// fastify.register(fastifyCookie, {
-//   secret: getenv('COOKIE_SECRET'), // for cookies signature
-//   parseOptions: {}, // options for parsing cookies
-// });
-// fastify.register(multipart, { attachFieldsToBody: true });
+
 fastify.register(multipart, { attachFieldsToBody: true });
 
 fastify.register(fastifyCors, {
@@ -60,72 +41,80 @@ fastify.register(fastifyCors, {
 
 fastify.register(require('fastify-sse-v2'));
 
-fastify.get(`/${sitePrefix}`, async () => {
+fastify.get(`/${sitePrefix}/`, async () => {
   return {
     hello: 'world',
-    version: process.versions.node,
-    server: fastify.server.address(),
+    node: process.versions.node,
+    version,
   };
 });
-// fastify.get('/sse', (request, reply) => {
-//   reply.sse(
-//     (async function* source() {
-//       for (let i = 0; i < 10; i++) {
-//         await sleep(2000);
-//         fastify.log.warn(`yielding ${String(i)}`);
-//         yield { id: String(i), data: 'Some message' };
-//       }
-//     })(),
-//   );
-// });
 
-fastify.get('/sse2', (request, reply) => {
-  // const eventEmitter = new EventEmitter();
-  reply.sse(
-    (async function* () {
-      for await (const event of on(eventEmitter, 'change_event')) {
-        let { id, ...data } = event.pop();
-        yield { id, data: JSON.stringify(data) };
-      }
-    })(),
-  );
+let msg = '';
+let lastId = null;
+function report(id, data, who, reqId) {
+  if (id === lastId) {
+    msg = `${msg} ${reqId}`;
+  } else {
+    msg = `${id} ${data} ${who} ${reqId}`;
+    lastId = id;
+  }
+  // logUpdate('yielding ', msg);
+  console.log('yielding ', msg);
+}
+
+fastify.get(`/${sitePrefix}/testsse`, () => {
+  testSSE();
+  return 'testing sse';
+});
+
+const testSSE = () => {
   let i = 0;
   let j = 0;
   setInterval(() => {
     eventEmitter.emit('change_event', {
-      id: 'some_event',
-      i: String(++i),
+      event: 'test',
+      id: `i-${++i}`,
       other: 'what',
     });
-    // console.log('some_event', String(i));
-  }, 3000);
+  }, 11000);
   setInterval(() => {
     eventEmitter.emit('change_event', {
-      id: 'other_event',
-      j: String(++j),
+      event: 'test',
+      id: `j-${++j}`,
       other: 'why',
     });
-    // console.log('some_event', String(i));
-  }, 7000);
-});
-fastify.get('/monitorChanges', (request, reply) => {
-  console.log('monitorChanges activated');
-  reply.sse(
+  }, 17000);
+};
+
+let reqIdNo = 0;
+fastify.get(`/${sitePrefix}/monitorChanges`, (request, response) => {
+  const reqId = `req-${++reqIdNo}`;
+  let closed = false;
+  const who = request.query.who;
+  console.log('bookingsServer/monitorChanges activated', who, reqId);
+  request.raw.on('close', () => {
+    closed = true;
+    // logUpdate.done();
+    console.log('Stopped sending events.', reqId);
+  });
+  response.sse(
     (async function* () {
-      for await (const event of on(eventEmitter, 'change_event')) {
-        let { id, ...data } = event.pop();
-        console.log('yielding', id, data);
-        yield {
-          id,
-          data: JSON.stringify(data),
-        };
+      for await (const e of on(eventEmitter, 'change_event')) {
+        if (closed) {
+          return '\n\n';
+        }
+        let { id, event, ...data } = e.pop();
+        data = JSON.stringify(data);
+        report(id, event, data, who, reqId);
+        // logUpdate.done();
+        yield { id, event, data };
       }
     })(),
   );
 });
 
-fastify.register(bookingsRoutes, { prefix: `${sitePrefix}bookings` });
-fastify.register(authRoutes, { prefix: `${sitePrefix}auth` });
+fastify.register(bookingsRoutes, { prefix: `${sitePrefix}/bookings` });
+fastify.register(authRoutes, { prefix: `${sitePrefix}/auth` });
 
 // !Run the server!
 const runit = async () => {
@@ -143,3 +132,4 @@ const runit = async () => {
   );
 };
 runit();
+testSSE();
