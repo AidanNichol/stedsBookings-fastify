@@ -1,4 +1,4 @@
-const legacyRoutes = require('./legacyRoutes.js');
+// const legacyRoutes = require('./legacyRoutes.js');
 const accountRoutes = require('./accountRoutes.js');
 // const authRoutes = require('../authRoutes.js');
 const { walkRoutes } = require('./walkRoutes.js');
@@ -20,6 +20,6 @@ async function bookingsRoutes(fastify) {
     const data = await updates.withPatches(request.body);
     reply.code(201).send(data);
   });
-  fastify.register(legacyRoutes);
+  // fastify.register(legacyRoutes);
 }
 module.exports = bookingsRoutes;
