@@ -1,6 +1,6 @@
 {
   "name": "steds-booking-fastify",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "private": true,
   "default": "dist/index.js",
   "targets": {
@@ -47,7 +47,8 @@
     "rollup": "rollup --config rollup.config.js ",
     "parcel": "parcel build server/index.js",
     "build2": "esbuild server/index.js --bundle --platform=node --target=node12.14 --outdir=dist --format=cjs --external:pg-hstore",
-    "deploy": "clear && yarn version --patch && node -r dotenv/config deploy.mjs"
+    "deploy": "clear && yarn version --patch && node -r dotenv/config deploy.mjs",
+    "migrate": "node --trace-warnings ./setup/migrateJustMembers.js"
   },
   "browserslist": {
     "production": [
