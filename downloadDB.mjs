@@ -3,7 +3,7 @@ import getenv from 'getenv';
 import logUpdate from 'log-update';
 import { format } from 'date-fns';
 example();
-let today = format(new Date(), 'yyyy-MM-ddTHH:mm');
+let today = format(new Date(), 'yyyy-MM-dd_HH-mm');
 
 async function example() {
   const client = new ftp.Client();
@@ -26,12 +26,14 @@ async function example() {
       secureOptions: { servername: 'ukhost4u.com' },
     });
     await client.ensureDir('/public_html/bookingsServer');
-
+    console.log(await client.pwd());
+    await client.downloadTo(`DBbackup/database.${today}D.sqlite`, 'database.sqlite');
+    await client.downloadTo(`database.sqlite`, 'database.sqlite');
+    // await client.uploadFrom('database.sqlite', 'database.sqlite');
     // await client.uploadFrom('.env', '.env');
-    await client.uploadFrom('package.json', 'package.json');
-    await client.uploadFromDir('server', 'server');
-    await client.uploadFromDir('models', 'models');
-    await client.uploadFromDir('ReportsPdf', 'ReportsPdf');
+    // await client.uploadFrom('package.json', 'package.json');
+    // await client.uploadFromDir('server', 'server');
+    // await client.uploadFromDir('models', 'models');
     // await client.rename('index.js', 'index0.js');
     // console.log(await client.list());
   } catch (err) {

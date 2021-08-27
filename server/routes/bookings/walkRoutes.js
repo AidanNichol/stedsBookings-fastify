@@ -2,18 +2,29 @@ const sequelize = require('sequelize');
 const Op = sequelize.Op;
 const models = require('../../../models');
 const { todaysDate: today } = require('./dateFns');
+const packageJson = require('../../../package.json');
+var { eventEmitter } = require('../../eventEmitter');
+
+const version = packageJson.version;
 
 const _ = require('lodash');
+// const { shortName, shortCode } = require('../../../models/walk');
 
 // Create an eventEmitter object
 
-var { eventEmitter } = require('../../eventEmitter');
+// var { eventEmitter } = require('../../eventEmitter');
 
 async function walkRoutes(fastify) {
   // fastify.get(``, async (request, reply) => {
   //   const movies = await queries.getInfo();
   //   return movies;
   // });
+  fastify.get(`/`, async () => {
+    return {
+      node: process.versions.node,
+      version,
+    };
+  });
   fastify.get(`/index`, async () => {
     return await models.Walk.findAll({
       attributes: [
@@ -27,14 +38,24 @@ async function walkRoutes(fastify) {
       ],
     });
   });
+  fastify.get(`/closeWalk/:walkId`, async (req) => {
+    const { walkId } = req.params;
+    await models.Walk.update({ closed: true }, { where: { walkId: walkId } });
+    eventEmitter.emit('change_event', { event: 'reload' });
+  });
   fastify.get(`/firstBooking`, async () => {
-    return await models.Walk.findOne({
+    console.log('today', today());
+    fastify.log.info('today ' + today());
+    const first = await models.Walk.findOne({
       order: ['walkId'],
       limit: 1,
       where: {
-        [Op.and]: [{ firstBooking: { [Op.lte]: today() } }, { closed: false }],
+        firstBooking: { [Op.lte]: today() },
+        closed: { [Op.ne]: true },
       },
     });
+    fastify.log.info('firstBooking ' + JSON.stringify(first));
+    return first;
   });
   fastify.get(`/allBuslists`, async () => {
     return await allBuslists();
@@ -51,18 +72,18 @@ async function walkRoutes(fastify) {
     return bookingCount();
   });
 }
-module.exports = { walkRoutes, refreshBookingCount };
-let timeoutId;
-function refreshBookingCount() {
-  if (timeoutId) clearTimeout(timeoutId);
-  timeoutId = setTimeout(async () => {
-    console.log('refreshing', 'BookingCount');
-    let data = await bookingCount();
-    // console.log('emmitting', data);
-    eventEmitter.emit('change_event', { event: 'refreshBookingCount', ...data });
-    timeoutId = null;
-  }, 100);
-}
+module.exports = { walkRoutes, bookingCount, walkdayData, allBuslists, numberWL };
+// let timeoutId;
+// function refreshBookingCount() {
+//   if (timeoutId) clearTimeout(timeoutId);
+//   timeoutId = setTimeout(async () => {
+//     console.log('refreshing', 'BookingCount');
+//     let data = await bookingCount();
+//     // console.log('emmitting', data);
+//     eventEmitter.emit('change_event', { event: 'refreshBookingCount', ...data });
+//     timeoutId = null;
+//   }, 100);
+// }
 async function bookingCount() {
   const bCount = `
     SELECT COUNT(*) 
@@ -131,7 +152,6 @@ async function walkdayData() {
   let accounts = walk.Bookings.map((b) => b.Member.accountId);
   const startDate = walk.firstBooking;
   accounts = _.uniqBy(accounts);
-  // console.log('walkday accounts', accounts);
   let current = await models.Account.findAll({
     where: { accountId: accounts },
     attributes: ['accountId', 'name', 'sortName'],
@@ -145,7 +165,7 @@ async function walkdayData() {
       },
       {
         model: models.Member,
-        attributes: ['memberId', 'shortName'],
+        attributes: ['memberId', 'firstName'],
         include: [
           {
             model: models.Booking,
@@ -157,22 +177,23 @@ async function walkdayData() {
                 { owing: { [Op.gt]: 0 } },
               ],
             },
+            include: [{ model: models.Walk, attibutes: ['shortCode', 'venue'] }],
           },
         ],
       },
     ],
   });
-  current = current.get({ plain: true });
+  current = current.map((a) => a.get({ plain: true }));
   return current;
 }
 
 async function allBuslists() {
   let data = await models.Walk.findAll({
-    attributes: ['walkId', 'venue', 'capacity', 'displayDate', 'longName'],
+    attributes: ['walkId', 'venue', 'capacity', 'displayDate', 'longName', 'shortCode'],
     include: {
       model: models.Booking,
       required: false,
-      attributes: ['memberId', 'status', 'updatedAt'],
+      attributes: ['memberId', 'status', 'updatedAt', 'annotation'],
       where: {
         status: ['B', 'C', 'W'],
       },
@@ -196,7 +217,6 @@ function numberWL(data) {
       (b) => b.updatedAt,
     );
     wait.forEach((wB, i) => (WLindex[walk.walkId + wB.memberId] = i + 1));
-    console.log('wait', wait, WLindex);
   });
   return [WLindex];
 }

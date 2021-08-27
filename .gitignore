@@ -13,3 +13,8 @@
 /junk
 deadfile*
 setup/userData.js
+/documents
+/DBbackup
+migrations
+*.old.sqlite
+/setup

@@ -93,7 +93,7 @@ function numberWL(data) {
       (b) => b.updatedAt,
     );
     wait.forEach((wB, i) => (WLindex[walk.walkId + wB.memberId] = i + 1));
-    console.log('wait', wait, WLindex);
+    // console.log('wait', wait, WLindex);
   });
   return [WLindex];
 }

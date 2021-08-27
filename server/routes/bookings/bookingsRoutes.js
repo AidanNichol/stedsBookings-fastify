@@ -2,7 +2,7 @@
 const accountRoutes = require('./accountRoutes.js');
 // const authRoutes = require('../authRoutes.js');
 const { walkRoutes } = require('./walkRoutes.js');
-const bankingRoutes = require('./bankingRoutes.js');
+const { bankingRoutes } = require('./bankingRoutes.js');
 const bookingRoutes = require('./bookingRoutes.js');
 const paymentRoutes = require('./paymentRoutes.js');
 const { memberRoutes } = require('./memberRoutes.js');

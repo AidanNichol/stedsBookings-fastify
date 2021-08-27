@@ -3,7 +3,7 @@ import getenv from 'getenv';
 import logUpdate from 'log-update';
 import { format } from 'date-fns';
 example();
-let today = format(new Date(), 'yyyy-MM-ddTHH:mm');
+let today = format(new Date(), `yyyy-MM-dd_HH-mm`);
 
 async function example() {
   const client = new ftp.Client();
@@ -26,14 +26,20 @@ async function example() {
       secureOptions: { servername: 'ukhost4u.com' },
     });
     await client.ensureDir('/public_html/bookingsServer');
+    console.log(await client.pwd());
 
-    // await client.uploadFrom('.env', '.env');
-    await client.uploadFrom('package.json', 'package.json');
-    await client.uploadFromDir('server', 'server');
-    await client.uploadFromDir('models', 'models');
-    await client.uploadFromDir('ReportsPdf', 'ReportsPdf');
-    // await client.rename('index.js', 'index0.js');
-    // console.log(await client.list());
+    const old = await client.list('database.old.sqlite');
+    if (old.length === 1) {
+      await client.remove('database.old.sqlite');
+    }
+
+    const curr = await client.list('database.sqlite');
+    if (curr.length === 1) {
+      await client.downloadTo(`DBbackup/database.${today}U.sqlite`, 'database.sqlite');
+      await client.rename('database.sqlite', 'database.old.sqlite');
+    }
+
+    await client.uploadFrom('database.sqlite', 'database.sqlite');
   } catch (err) {
     console.log(err);
   }

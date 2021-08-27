@@ -1,10 +1,20 @@
 const models = require('../../../models');
 const { Op } = require('sequelize');
+const { paymentsReceivedRpt } = require('../../../ReportsPdf/paymentsReceivedRpt');
+const fs = require('fs');
+const path = require('path');
 
 // const { todaysDate: today } = require('./dateFns');
 // const _ = require('lodash');
 
 async function paymentRoutes(fastify) {
+  fastify.get(`/paymentsReceivedRpt`, async (req, res) => {
+    let fileName = await paymentsReceivedRpt();
+    console.log('about to send members report');
+    res.header('Content-Disposition', `inline; filename="${fileName}"`);
+    const stream = fs.createReadStream(path.resolve(`documents/${fileName}`));
+    res.type('application/pdf').send(stream);
+  });
   fastify.get(`/paymentsMade`, async () => {
     return await models.Payment.findAll({
       order: ['paymentId'],

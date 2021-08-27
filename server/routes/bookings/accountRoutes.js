@@ -8,7 +8,16 @@ async function accountRoutes(fastify) {
       include: [
         {
           model: models.Member,
-          attributes: ['memberId', 'firstName', 'lastName', 'shortName'],
+          attributes: [
+            'memberId',
+            'firstName',
+            'lastName',
+            'shortName',
+            'memberStatus',
+            'deleteState',
+            'suspended',
+            'subscription',
+          ],
         },
       ],
     });

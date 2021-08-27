@@ -59,7 +59,7 @@ function report(id, data, who, reqId) {
     lastId = id;
   }
   // logUpdate('yielding ', msg);
-  console.log('yielding ', msg);
+  // console.log('yielding ', msg);
 }
 
 fastify.get(`/${sitePrefix}/testsse`, () => {
@@ -84,6 +84,17 @@ const testSSE = () => {
       other: 'why',
     });
   }, 17000);
+};
+const heartbeat = () => {
+  let j = 0;
+
+  setInterval(() => {
+    eventEmitter.emit('change_event', {
+      event: 'heartbeat',
+      id: `j-${++j}`,
+      other: 'why',
+    });
+  }, 2 * 60000 - 5);
 };
 
 let reqIdNo = 0;
@@ -132,4 +143,5 @@ const runit = async () => {
   );
 };
 runit();
+heartbeat();
 // testSSE();
