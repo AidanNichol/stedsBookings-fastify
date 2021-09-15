@@ -71,23 +71,23 @@ async function paymentsReceivedRpt(doc) {
   const titleSize = 40;
   const memSize = 11;
   let p = getPageDimensions();
-  setPageDimensions(210, 297);
+  setPageDimensions(210, 297, 10, 8, 14);
   setNoCols(2, 3, 10, true);
-  setSubHeading(titleSize);
+  // setSubHeading(titleSize);
   pageHeader(doc, 'Payments Received');
   doc.setFontSize(12);
   // const putHText = (right) => [right ? x + colWidth - hPad : x + hPad, y + titleSize / 2];
   // const putMText = (i, off = 0) => [x + hPad + off, y + titleSize + (i + 0.5) * memSize];
 
   doc.setTextColor(51).setDrawColor(51);
-  const b = placeBlock(titleSize);
+  const h = p.header.sub;
 
   const headerText = `${dispDate(startDate)} to ${dispDate(endDate)}`;
-  doc.text(headerText, b.center, b.middle, align.CM);
+  doc.text(headerText, h.center, h.middle, align.CM);
   for (const { sortName, balance } of paymentsMade) {
     let { left, middle, right } = placeBlock(memSize);
 
-    doc.text(sortName, left, middle, y, align.LM);
+    doc.text(sortName, left, middle, align.LM);
     doc.text(`£${balance}`, right, middle, align.RM);
   }
   const block = placeBlock(2 * memSize);
