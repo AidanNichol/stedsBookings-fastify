@@ -31,6 +31,7 @@ module.exports.withPatches = async (patches) => {
   const t = await models.sequelize.transaction();
   try {
     const result = [];
+    let bookingChange = false;
     for (const patch of patches) {
       // patches.forEach((patch) => {
       const { op, path, value } = patch;
@@ -41,9 +42,7 @@ module.exports.withPatches = async (patches) => {
           result.push({ op, path, patch: 'applied' });
           var memberId = value && value.bookingId && value.bookingId.substr(11);
           qEvent({ event: 'bookingChange', memberId });
-          var data = await bookingCount();
-          // console.log('emmitting', data);
-          qEvent({ event: 'refreshBookingCount', ...data });
+          bookingChange = true;
           break;
         case 'Payment':
           await processItem(op, path, value, table, key, item, t);
@@ -71,6 +70,11 @@ module.exports.withPatches = async (patches) => {
       }
     }
     await t.commit();
+    if (bookingChange) {
+      var data = await bookingCount();
+      // console.log('emmitting', data);
+      qEvent({ event: 'refreshBookingCount', ...data });
+    }
     sendEvents();
     // bookingChanged(memberId, accountId, payments);
     return result;
