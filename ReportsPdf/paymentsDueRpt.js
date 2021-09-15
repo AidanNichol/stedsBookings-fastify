@@ -52,9 +52,9 @@ async function getDebtsData() {
 async function paymentsDueRpt(doc) {
   pageHeader(doc, 'Payments Due');
 
-  const colWidth = setNoCols(3, 3, 10, true);
+  setNoCols(3, 3, 10, true);
   const debtsDue = await getDebtsData();
-  let x, y;
+
   doc.setLineWidth(0.75);
 
   const totalDue = debtsDue.reduce((sum, account) => sum + account.balance, 0);
@@ -62,8 +62,6 @@ async function paymentsDueRpt(doc) {
   const titleSize = 14;
   const memSize = 11;
   const hPad = 3;
-  const putHText = (right) => [right ? x + colWidth - hPad : x + hPad, y + titleSize / 2];
-  const putMText = (i, off = 0) => [x + hPad + off, y + titleSize + (i + 0.5) * memSize];
 
   doc.setTextColor('#333333').setDrawColor(51);
   for (const account of debtsDue) {
@@ -88,7 +86,12 @@ async function paymentsDueRpt(doc) {
 
       doc.text(bkng.displayDate, left + hPad, y, align.LM);
       drawIcon(doc, bkng.status, left + hPad + 64, y, 9);
-      doc.text(bkng.venue + ' ' + bkng.name, left + hPad + 72, y, align.LM);
+      doc.text(
+        fitBox(doc, bkng.name + ' ' + bkng.venue, 9, width - hPad - 72),
+        left + hPad + 72,
+        y,
+        align.LM,
+      );
 
       // {$index.get(bkng.walkId).venue || ''}
       // {shortName(bkng.memberId, account.accountId)}
@@ -100,5 +103,16 @@ async function paymentsDueRpt(doc) {
   doc.text(`Total Due £${totalDue}`, left, top, align.LT);
   doc.setFont('helvetica', 'normal');
   // if (accounts.length > 0) imReady('debts');
+}
+function fitBox(doc, text, fontSize, width) {
+  let size = fontSize * doc.getStringUnitWidth(text);
+
+  if (size <= width) return text;
+  do {
+    text = text.substr(0, text.length - 1);
+    size = fontSize * doc.getStringUnitWidth(text + '…');
+  } while (size > width);
+
+  return text + '…';
 }
 exports.paymentsDueRpt = paymentsDueRpt;

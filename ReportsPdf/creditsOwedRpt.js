@@ -16,6 +16,7 @@ const _ = require('lodash');
 let accounts = [];
 // const imReady = useStoreActions((a) => a.reports.imReady);
 async function getCreditsData() {
+  accounts = [];
   let res = await models.Payment.findAll({
     order: ['paymentId'],
     where: { available: { [Op.gt]: 0 } },
@@ -99,7 +100,7 @@ async function getCreditsData() {
 async function creditsOwedRpt(doc) {
   pageHeader(doc, 'Credits Owed');
 
-  const colWidth = setNoCols(3, 3, 10, true);
+  setNoCols(3, 3, 10, true);
   const creditsDue = await getCreditsData();
 
   doc.setLineWidth(0.75);
@@ -132,8 +133,12 @@ async function creditsOwedRpt(doc) {
       // let wd = doc.getStringUnitWidth(bkng.displayDate) * 10;
       doc.text(bkng.date, left + hPad, y, align.LM);
       drawIcon(doc, bkng.req, left + hPad + 64, y, 9);
-      doc.text(bkng.desc + ' ' + bkng.name, left + hPad + 72, y, align.LM);
-
+      doc.text(
+        fitBox(doc, bkng.name + ' ' + bkng.venue, 9, width - hPad - 72),
+        left + hPad + 72,
+        y,
+        align.LM,
+      );
       // {$index.get(bkng.walkId).venue || ''}
       // {shortName(bkng.memberId, account.accountId)}
     }
@@ -145,4 +150,16 @@ async function creditsOwedRpt(doc) {
   doc.setFont('helvetica', 'normal');
   // if (accounts.length > 0) imReady('debts');
 }
+function fitBox(doc, text, fontSize, width) {
+  let size = fontSize * doc.getStringUnitWidth(text);
+
+  if (size <= width) return text;
+  do {
+    text = text.substr(0, text.length - 1);
+    size = fontSize * doc.getStringUnitWidth(text + '…');
+  } while (size > width);
+
+  return text + '…';
+}
+
 exports.creditsOwedRpt = creditsOwedRpt;
