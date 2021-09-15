@@ -18,3 +18,4 @@ setup/userData.js
 migrations
 *.old.sqlite
 /setup
+ReportsPdf/testPdf.js
