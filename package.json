@@ -1,6 +1,6 @@
 {
   "name": "steds-booking-fastify",
-  "version": "0.1.48",
+  "version": "0.1.49",
   "private": true,
   "default": "dist/index.js",
   "targets": {
@@ -12,6 +12,7 @@
     "node": "12"
   },
   "dependencies": {
+    "@vrbo/pino-rotating-file": "^3.0.0",
     "bcryptjs": "^2.4.3",
     "chalk": "^4.0.0",
     "clear": "^0.1.0",
@@ -54,7 +55,8 @@
     "downloadDB": "clear && node -r dotenv/config downloadDB.mjs",
     "uploadDB": "clear && node -r dotenv/config uploadDB.mjs",
     "migrate": "node --trace-warnings ./setup/migrateJustMembers.js",
-    "testpdf": "clear&&nodemon ./ReportsPdf/createSummaryPdf.js"
+    "testpdf": "clear&&nodemon ./ReportsPdf/createSummaryPdf.js",
+    "rotateLogs": "rotate-logs --config=rotate.js"
   },
   "browserslist": {
     "production": [
