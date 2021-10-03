@@ -1,6 +1,6 @@
 {
   "name": "steds-booking-fastify",
-  "version": "0.1.78",
+  "version": "0.1.79",
   "private": true,
   "default": "dist/index.js",
   "targets": {
@@ -75,6 +75,7 @@
     "@rollup/plugin-json": "^4.1.0",
     "@rollup/plugin-node-resolve": "^13.0.0",
     "basic-ftp": "^4.6.6",
+    "date-fns-tz": "^1.1.6",
     "deadfile": "^1.2.2",
     "eslint": "^7.28.0",
     "eslint-config-prettier": "^8.3.0",
