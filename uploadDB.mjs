@@ -1,7 +1,10 @@
+/* eslint-disable node/no-unpublished-import */
 import ftp from 'basic-ftp';
 import getenv from 'getenv';
 import logUpdate from 'log-update';
 import { format } from 'date-fns';
+import { requestRestart } from './serverUtils.mjs';
+
 example();
 let today = format(new Date(), `yyyy-MM-dd_HH-mm`);
 
@@ -40,6 +43,8 @@ async function example() {
     }
 
     await client.uploadFrom('database.sqlite', 'database.sqlite');
+    await client.uploadFrom('package.json', 'package.json');
+    await requestRestart(client);
   } catch (err) {
     console.log(err);
   }

@@ -1,9 +1,8 @@
+/* eslint-disable node/no-unpublished-import */
 import ftp from 'basic-ftp';
 import getenv from 'getenv';
 import logUpdate from 'log-update';
-import { format } from 'date-fns';
-example();
-let today = format(new Date(), 'yyyy-MM-ddTHH:mm');
+import { requestRestart } from './serverUtils.mjs';
 
 async function example() {
   const client = new ftp.Client();
@@ -32,6 +31,8 @@ async function example() {
     await client.uploadFromDir('server', 'server');
     await client.uploadFromDir('models', 'models');
     await client.uploadFromDir('ReportsPdf', 'ReportsPdf');
+    await requestRestart(client);
+    console.log(await client.list('tmp'));
     // await client.rename('index.js', 'index0.js');
     // console.log(await client.list());
   } catch (err) {
@@ -39,3 +40,4 @@ async function example() {
   }
   client.close();
 }
+example();
