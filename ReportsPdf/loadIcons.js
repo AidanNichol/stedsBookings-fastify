@@ -8,12 +8,15 @@ const clock = require('./images/faClock.js');
 const pound = require('./images/faPoundSign.js');
 const circle = require('./images/faCircle.js');
 const square = require('./images/faSquare.js');
+const credit = require('./images/ajnCredit.js');
+const treasurer = require('./images/ajnTreasurer.js');
 let debug = false;
 
 // const slash = require('./images/faSlash.js');
 const iconWidth = {};
+const iconHeight = {};
 function loadIcons(doc) {
-  [bus, car, clock, pound, square, circle].map((icn) => {
+  [bus, car, clock, pound, square, circle, credit, treasurer].map((icn) => {
     parseIcon(icn);
   });
   loadIcon(doc, bus, '#008000', 'B');
@@ -22,16 +25,28 @@ function loadIcons(doc) {
   loadIcon(doc, car, '#0000ff', 'C');
   loadIcon(doc, car, '#0000ff', 'CX', true);
   loadIcon(doc, clock, '#444444', 'W');
+  loadIcon(doc, clock, '#444444', 'WX', true);
   loadIcon(doc, pound, '#000000', 'P');
+  loadIcon(doc, pound, '#000000', 'PX', true);
   loadIcon(doc, square, '#000000', 'square');
   loadIcon(doc, circle, '#000000', 'circle');
+  loadIcon(doc, credit, '#000000', '+');
+  loadIcon(doc, credit, '#000000', '+X', true);
+  loadIcon(doc, treasurer, '#000000', 'T');
+  loadIcon(doc, treasurer, '#000000', 'TX', true);
 }
 function drawIcon(doc, name, x, y, size) {
-  const scale = size / 512;
+  const ht = iconHeight[name];
+  const scale = size / ht;
   const ey = y - size / 2;
-  const ex = x - (size * (iconWidth[name] / 512)) / 2;
+  const ex = x - (size * (iconWidth[name] / ht)) / 2;
   doc.advancedAPI((doc) => {
-    doc.doFormObject(name, new doc.Matrix(scale, 0, 0, scale, ex, ey));
+    try {
+      doc.doFormObject(name, new doc.Matrix(scale, 0, 0, scale, ex, ey));
+    } catch (error) {
+      console.log('draw icon error', name, scale, ex, ey, error);
+      doc.text(name, ex, ey);
+    }
   });
 }
 function parseIcon(icon) {
@@ -45,12 +60,16 @@ function parseIcon(icon) {
 function loadIcon(doc, icon, iconColor, iconName, slash = false) {
   doc.advancedAPI((doc) => {
     const { width, height, pdfPaths } = icon;
-    iconWidth[iconName] = width;
+    const scale = 512 / height;
+    const shrink = height / 512;
+    iconWidth[iconName] = width * scale;
+    iconHeight[iconName] = height * scale;
     // let colors = ['#00ff00', '#ffff00', '#ff0000', '#0000ff'];
 
-    const identityMatrix = new doc.Matrix(1, 0, 0, 1, 0, 0);
+    let initMatrix = new doc.Matrix(scale, 0, 0, scale, 0, 0);
+    new doc.Matrix(scale, 0, 0, scale, 0, 0);
 
-    doc.beginFormObject(0, 0, width, height, identityMatrix);
+    doc.beginFormObject(0, 0, width * scale, height * scale, initMatrix);
     const drawC = ['#ff0000', '#00ff00', '#0000ff'];
     let i = 0;
     for (const pdfPath of pdfPaths) {
@@ -66,13 +85,17 @@ function loadIcon(doc, icon, iconColor, iconName, slash = false) {
       doc.restoreGraphicsState();
     }
     if (slash) {
-      doc.setDrawColor('#ffffff').setLineWidth(100);
-      doc.line(10, 10, 500, 500);
-      doc.setDrawColor('#ff0000').setLineWidth(60).setLineCap(1);
-      doc.line(10, 10, 500, 500);
+      doc.setDrawColor('#ffffff').setLineWidth(100 * shrink);
+      doc.line(10 * shrink, 10 * shrink, 500 * shrink, 500 * shrink);
+      doc
+        .setDrawColor('#ff0000')
+        .setLineWidth(60 * shrink)
+        .setLineCap(1);
+      doc.line(10 * shrink, 10 * shrink, 500 * shrink, 500 * shrink);
     }
     doc.endFormObject(iconName);
   });
+  console.log({ iconColor, iconName, slash });
 }
 function debugPath(doc, pdfPath) {
   let i = 0;
