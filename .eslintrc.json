@@ -1,11 +1,12 @@
 {
   "env": {
     "browser": false,
-    "es6": true
+    "es6": true,
+    "node": true
   },
   "parserOptions": {
     "ecmaVersion": 2020,
-    "sourceType": "script"
+    "sourceType": "module"
   },
   "extends": ["eslint:recommended", "plugin:node/recommended"],
 
