@@ -29,6 +29,7 @@ async function paymentRoutes(fastify) {
       attributes: ['paymentId', 'amount', 'req', 'available', 'accountId'],
       include: {
         model: models.Allocation,
+        order: ['updatedAt'],
         required: false,
         include: {
           model: models.Booking,
