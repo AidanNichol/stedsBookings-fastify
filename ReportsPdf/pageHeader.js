@@ -11,11 +11,11 @@ console.log(cwd);
 const local = jetpack.cwd('./ReportsPdf');
 console.log(local.cwd());
 const logo = local.read('images/St.Edwards.col4a.png', 'buffer');
-
+let noPages = 0;
 function pageHeader(doc, title) {
   doc.addPage();
   doc.advancedAPI((doc) => {
-    const h = p.headerHt;
+    const h = p.header;
     doc.addImage(logo, 'png', h.left, h.top, h.headerHt, h.headerHt);
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(h.headerHt * 0.55);
@@ -25,11 +25,11 @@ function pageHeader(doc, title) {
     doc.setFontSize(h.headerHt * 0.35);
     // doc.circle(mmToPt(200), mmToPt(17), 2, 'F');
     doc.text(timestamp, h.right, h.middle - 1, align.RB);
-    pageNo++;
+    noPages++;
     // doc.text(`Page ${pageNo++}`, rX, textY + 1, align.RT);
   });
 }
-function numberPages(doc, noPages) {
+function numberPages(doc) {
   // doc.advancedAPI((doc) => {
   const h = p.headerHt;
   doc.setFontSize(h.headerHt * 0.35);
