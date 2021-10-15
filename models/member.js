@@ -4,7 +4,7 @@ const Member = {
   accountId: DataTypes.STRING,
   firstName: DataTypes.STRING,
   lastName: DataTypes.STRING,
-  shortName: DataTypes.STRING,
+  shortName: { type: DataTypes.STRING, defaultValue: '' },
   address: DataTypes.STRING,
   phone: DataTypes.STRING,
   email: DataTypes.STRING,
@@ -52,7 +52,7 @@ const Member = {
       return getSubsStatus(this.memberStatus, this.subscription);
     },
     set() {
-      throw new Error('Do not try to set the `fullName` value!');
+      throw new Error('Do not try to set the `subsStatus` value!');
     },
   },
 };
