@@ -32,6 +32,7 @@ specifiers:
   lodash: ^4.17.15
   log-update: ^4.0.0
   nodemon: ^2.0.12
+  pino: ^6.13.3
   sequelize: ^6.6.2
   sequelize-cli: ^6.2.0
   sprintf-js: ^1.1.2
@@ -61,6 +62,7 @@ dependencies:
   getenv: 1.0.0
   jspdf: 2.3.1
   lodash: 4.17.21
+  pino: 6.13.3
   sequelize: 6.6.5_sqlite3@5.0.2
   sequelize-cli: 6.2.0
   sprintf-js: 1.1.2
@@ -2941,6 +2943,19 @@ packages:
     dependencies:
       fast-redact: 3.0.1
       fast-safe-stringify: 2.0.8
+      flatstr: 1.0.12
+      pino-std-serializers: 3.2.0
+      quick-format-unescaped: 4.0.3
+      sonic-boom: 1.4.1
+    dev: false
+
+  /pino/6.13.3:
+    resolution: {integrity: sha512-tJy6qVgkh9MwNgqX1/oYi3ehfl2Y9H0uHyEEMsBe74KinESIjdMrMQDWpcZPpPicg3VV35d/GLQZmo4QgU2Xkg==}
+    hasBin: true
+    dependencies:
+      fast-redact: 3.0.1
+      fast-safe-stringify: 2.0.8
+      fastify-warning: 0.2.0
       flatstr: 1.0.12
       pino-std-serializers: 3.2.0
       quick-format-unescaped: 4.0.3

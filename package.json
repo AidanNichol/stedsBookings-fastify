@@ -12,7 +12,6 @@
     "node": "12"
   },
   "dependencies": {
-    "@vrbo/pino-rotating-file": "^3.0.0",
     "bcryptjs": "^2.4.3",
     "chalk": "^4.0.0",
     "clear": "^0.1.0",
@@ -43,6 +42,7 @@
     "ws": "^7.2.5"
   },
   "scripts": {
+    "preinstall": "npx  only-allow pnpm",
     "server": "node ./src/server/index.js",
     "deadfile": "./deadfile.sh",
     "servertest": "sirv dist/index.js",
