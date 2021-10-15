@@ -1,6 +1,7 @@
 // Require the framework and instantiate it
 const fastifyPkg = require('fastify');
 const fastifyCors = require('fastify-cors');
+const { stdTimeFunctions } = require('pino');
 // const fastifyCookie = require('fastify-cookie');
 // const fastifyStatic = require('fastify-static');
 const multipart = require('fastify-multipart');
@@ -9,8 +10,41 @@ var { eventEmitter, on } = require('./eventEmitter');
 const bookingsRoutes = require('./routes/bookings/bookingsRoutes.js');
 const { authRoutes } = require('./routes/authRoutes.js');
 const packageJson = require('../package.json');
+const fs = require('fs');
+const {
+  format,
+  formatISO9075,
+  // addHours,
+  startOfTomorrow,
+  differenceInMilliseconds,
+  intervalToDuration,
+  formatDuration,
+} = require('date-fns');
+let today = format(new Date(), 'yyyy-MM-dd');
 const version = packageJson.version;
 
+const requestRestart = () => {
+  let localTime = new Date();
+
+  fastify.log.info(`Restart requested @ ${formatISO9075(localTime)}`);
+  fs.utimesSync('./tmp/restart.txt', localTime, localTime);
+  console.log('Restart Requested', formatISO9075(localTime));
+};
+if (fs.existsSync('./temp/started.txt')) {
+  fs.unlinkSync('./tmp/started.txt');
+}
+let tomorrow = startOfTomorrow();
+const now = new Date();
+let diff = differenceInMilliseconds(tomorrow, now);
+let dur = intervalToDuration({ start: now, end: tomorrow });
+const durF = formatDuration(dur);
+const nowF = formatISO9075(now);
+const tomorrowF = formatISO9075(tomorrow);
+fs.writeFileSync(
+  './tmp/started.txt',
+  `${nowF} version ${version}.   Restart in ${durF} @ ${tomorrowF}`,
+);
+setTimeout(() => requestRestart(), diff);
 const http = require('http');
 // const { promisify } = require('util');
 // const sleep = promisify(setTimeout);
@@ -28,7 +62,8 @@ const fastify = fastifyPkg({
   serverFactory,
   logger: {
     level: 'info',
-    file: './logs/fastify.log', // will use pino.destination()
+    file: `./logs/fastify-${today}.log`, // will use pino.destination()
+    timestamp: stdTimeFunctions.isoTime,
   },
 });
 
@@ -92,7 +127,7 @@ const heartbeat = () => {
     eventEmitter.emit('change_event', {
       event: 'heartbeat',
       id: `j-${++j}`,
-      other: 'why',
+      version,
     });
   }, 2 * 60000 - 5);
 };
@@ -136,11 +171,9 @@ const runit = async () => {
     // eslint-disable-next-line no-process-exit
     process.exit(1);
   }
-  console.log(
-    `version:${version}. Listening on ${JSON.stringify(fastify.server.address())}:${
-      fastify.server.address().port
-    }`,
-  );
+  const msg = `version:${version}. Listening on 4444. Will restart in ${durF} @ ${tomorrowF}`;
+  console.log(msg);
+  fastify.log.info(msg);
 };
 runit();
 heartbeat();
