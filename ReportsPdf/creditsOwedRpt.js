@@ -1,11 +1,4 @@
-const {
-  pageHeader,
-  placeBlock,
-  setNoCols,
-  align,
-  drawHeader,
-  page: p,
-} = require('./pdfSetup');
+const { pageHeader, placeBlock, setNoCols, align, drawHeader } = require('./pdfSetup');
 
 const { drawIcon } = require('./loadIcons.js');
 const models = require('../models');
@@ -52,16 +45,16 @@ async function getCreditsData() {
 
   const creditsOwed = res.map((a) => a.get({ plain: true }));
   _.sortBy(creditsOwed, ['accountId', 'paymentId']);
-  let accs = _.groupBy(creditsOwed, (p) => p.accountId);
+  let accs = _.groupBy(creditsOwed, (cr) => cr.accountId);
   Object.entries(accs).forEach(([accountId, credits]) => {
     let acc = { accountId, name: credits[0].Account.sortname, total: 0, credits: [] };
     acc.noMembs = credits[0].Account.Members.length;
 
     acc.payments = [];
-    for (const p of credits) {
-      acc.total += p.available;
+    for (const cr of credits) {
+      acc.total += cr.available;
       // let allocations=_.groupBy(_.sortBy(p.Allocation, ['bookingId',]), 'bookingId')
-      let credits = p.Allocations.map((a) => ({
+      let credits = cr.Allocations.map((a) => ({
         ...a,
         ..._.pick(a.Booking, ['status', 'walkId', 'memberId']),
       })).filter((a) => a.status.match(/[BC]X/));
@@ -70,9 +63,9 @@ async function getCreditsData() {
       credits = _.unionBy(credits, 'bookingId');
       credits = _.orderBy(credits, ['bookingId'], ['desc']);
       for (const credit of credits) {
-        let amount = Math.min(p.available, -credit.amount);
+        let amount = Math.min(cr.available, -credit.amount);
         if (amount > 0) {
-          p.available -= amount;
+          cr.available -= amount;
           acc.credits.push({
             date: dispDate(credit.updatedAt || credit.paymentId),
             req: credit.status,
@@ -82,13 +75,13 @@ async function getCreditsData() {
           });
         }
       }
-      if (p.available > 0)
+      if (cr.available > 0)
         acc.credits.push({
-          date: dispDate(p.paymentId),
-          req: p.req,
-          desc: `(*£${p.amount})`,
+          date: dispDate(cr.paymentId),
+          req: cr.req,
+          desc: `(*£${cr.amount})`,
           name: '',
-          amount: p.available,
+          amount: cr.available,
         });
     }
     accounts = [...accounts, acc];
@@ -134,7 +127,7 @@ async function creditsOwedRpt(doc) {
       doc.text(bkng.date, left + hPad, y, align.LM);
       drawIcon(doc, bkng.req, left + hPad + 64, y, 9);
       doc.text(
-        fitBox(doc, bkng.name + ' ' + bkng.venue, 9, width - hPad - 72),
+        fitBox(doc, bkng.name + ' ' + bkng.desc, 9, width - hPad - 72),
         left + hPad + 72,
         y,
         align.LM,
