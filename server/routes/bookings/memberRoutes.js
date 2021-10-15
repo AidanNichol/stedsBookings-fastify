@@ -65,6 +65,7 @@ async function memberRoutes(fastify) {
         },
       },
     });
+    data.shortName = data.Account.Members > 1 ? `[${data.firstName}]` : '';
     // } catch (error) {
     //   let { message, name, DatabaseError, sql } = error;
 
