@@ -1,4 +1,13 @@
-const { placeBlock, setNoCols, align, drawHeader, pageHeader } = require('./pdfSetup');
+const {
+  placeBlock,
+  setNoCols,
+  align,
+  drawHeader,
+  pageHeader,
+  getPageDimensions,
+  truncateText,
+} = require('./pdfSetup');
+const { format, parseISO } = require('date-fns');
 const { drawIcon } = require('./loadIcons.js');
 const {
   allBuslists,
@@ -9,23 +18,25 @@ const {
 // const { dispDate } = require('../server/routes/bookings/dateFns');
 const _ = require('lodash');
 // const { shortName } = require('../models/walk');
+const ftHt = 12;
 
 async function walkDayBookingSheet(doc) {
   pageHeader(doc, 'Walk Day Sheet');
 
-  const colWidth = setNoCols(2, 3, 10, true);
+  const colWidth = setNoCols(2, 3, 10, true, ftHt);
   const res = await walkdayData();
   const openWalks = await allBuslists();
   const WL = await numberWL(openWalks);
   const docDate = openWalks[0].walkId.substr(1);
   const accounts = gatherData(res, WL[0], openWalks);
-  let x, y;
+  // let x, y;
   doc.setLineWidth(0.75);
 
   const titleSize = 12;
   const memSize = 12;
   const hPad = 3;
   const cSize = 30;
+  printWalkDates(doc, openWalks);
 
   const balColor = (balance) => (balance < 0 ? '#F7C5C5' : '#CCFFCF');
   const balance = (balance) => (balance > 0 ? `£+${balance}` : `£-${-balance}`);
@@ -53,10 +64,17 @@ async function walkDayBookingSheet(doc) {
     };
 
     const boxHeight = titleSize + noMembs * memSize;
-    const { left: x, top: y } = placeBlock(boxHeight);
+    const { left: x, top: y, pageBreak } = placeBlock(boxHeight);
+    if (pageBreak) {
+      printContinued(doc);
+      pageHeader(doc, 'Walk Day Sheet');
+      printWalkDates(doc, openWalks);
+    }
     let lines = drawHeader(titleSize, colWidth, 4);
     doc.setTextColor(51);
-    doc.setFillColor('#d8bfd8').lines(lines, x, y + titleSize, [1, 1], 'FD', true);
+    doc
+      .setFillColor(account.WL ? '#b9d9eb' : '#d8bfd8')
+      .lines(lines, x, y + titleSize, [1, 1], 'FD', true);
     doc.roundedRect(x, y, colWidth, boxHeight, 4, 4, 'S');
     doc.setFontSize(11);
     doc.text(account.sortName, ...putHText(), align.LM);
@@ -99,7 +117,40 @@ async function walkDayBookingSheet(doc) {
       });
     });
   }
+
   return docDate;
+}
+function printContinued(doc) {
+  doc.saveGraphicsState();
+  doc.setFontSize(11);
+  const { body } = getPageDimensions();
+  doc.text('continued…', body.right, body.bottom - ftHt - 2, align.RB);
+
+  doc.restoreGraphicsState();
+}
+function printWalkDates(doc, openWalks) {
+  doc.saveGraphicsState();
+  doc.setFontSize(11);
+  const kg = 3;
+  const { body } = getPageDimensions();
+  const x = body.left;
+  let y = body.bottom - ftHt;
+  const w = body.width / Math.max(4, openWalks.length - 1);
+  // const w = body.width / (openWalks.length - 1);
+  let y1 = y + ftHt / 2;
+  const walks = openWalks.slice(openWalks.length > 4 ? 1 : 0);
+  walks.forEach((walk, i) => {
+    let x1 = x + i * w;
+    doc.setFillColor(i % 2 ? '#d0debb' : '#eefbb6').setDrawColor('#083309');
+    doc.rect(x1, y, w, ftHt, 'FD');
+    const dat = format(parseISO(walk.walkId.substr(1)), 'dd MMM');
+
+    const venue = truncateText(doc, walk.venue, w - 39 - 2 * kg);
+    doc.text(dat, x1 + kg, y1, align.LM);
+    doc.text(venue, x1 + kg + 39, y1, align.LM);
+  });
+  // doc.rect(x, y, body.width, ftHt, 'S');
+  doc.restoreGraphicsState();
 }
 
 function gatherData(accounts, WLindex, openWalks) {
@@ -112,6 +163,8 @@ function gatherData(accounts, WLindex, openWalks) {
   accounts.forEach((account) => {
     // logit('account @start', account);
     const noMems = account.Members.length;
+    let WL = true;
+
     account.codes = [];
     account.debt = 0;
     account.credit = account.Payments.reduce((tot, p) => tot + p.available, 0);
@@ -122,6 +175,7 @@ function gatherData(accounts, WLindex, openWalks) {
 
       member.Bookings.forEach((bkng) => {
         let icon;
+        if (bkng.walkId === nextWalkId && bkng.status !== 'W') WL = false;
         account.debt += bkng.owing;
         if (bkng.walkId < nextWalkId && bkng.owing > 0) {
           const code = bkng.Walk.shortCode || bkng.Walk.venue.substr(0, 4);
@@ -140,7 +194,11 @@ function gatherData(accounts, WLindex, openWalks) {
       (c) => c[0],
     );
     account.balance = account.credit - account.debt;
+    account.WL = WL;
   });
-  return _.sortBy(accounts, (a) => a.sortName);
+  let list = accounts.filter((a) => !a.WL);
+  let listWL = accounts.filter((a) => a.WL);
+  console.log('lists', list.length, listWL.length);
+  return [..._.sortBy(list, (a) => a.sortName), ..._.sortBy(listWL, (a) => a.sortName)];
 }
 exports.walkDayBookingSheet = walkDayBookingSheet;

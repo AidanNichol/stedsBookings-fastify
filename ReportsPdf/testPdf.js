@@ -1,7 +1,9 @@
-// const { createSummaryPdf } = require('./createSummaryPdf');
-// createSummaryPdf();
+const { createSummaryPdf } = require('./createSummaryPdf');
+createSummaryPdf();
 // const { paymentsReceivedRpt } = require('./paymentsReceivedRpt');
 // paymentsReceivedRpt();
-const { membershipListRpt } = require('./membershipListRpt');
+// const { creditsOwedRpt } = require('./creditsOwedRpt');
+// creditsOwedRpt();
+// const { membershipListRpt } = require('./membershipListRpt');
 // membershipListRpt('Y', 'memNo');
-membershipListRpt('N', 'sortName');
+// membershipListRpt('N', 'sortName');

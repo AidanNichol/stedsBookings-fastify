@@ -122,7 +122,7 @@ function getPageDimensions() {
 //   p.body.height -= sz;
 //   p.y = p.body.top;
 // }
-const setNoCols = (noCols, rowGap, colGap, autoB = true) => {
+const setNoCols = (noCols, rowGap, colGap, autoB = true, ftHt = 0) => {
   p.noCols = noCols;
   p.rowGap = rowGap;
   p.colGap = colGap;
@@ -134,7 +134,7 @@ const setNoCols = (noCols, rowGap, colGap, autoB = true) => {
     left: p.margin,
     right: p.margin + colWidth,
     top: p.body.top,
-    bottom: p.body.bottom,
+    bottom: p.body.bottom - ftHt,
     width: colWidth,
   };
   p.x = p.col.left;
