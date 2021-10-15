@@ -3,7 +3,7 @@ const {
   placeBlock,
   setNoCols,
   align,
-  setSubHeading,
+  // setSubHeading,
   numberPages,
   getPageDimensions,
   setPageDimensions,
@@ -68,7 +68,7 @@ async function paymentsReceivedRpt(doc) {
 
   const totalPayments = paymentsMade.reduce((sum, account) => sum + account.balance, 0);
 
-  const titleSize = 40;
+  // const titleSize = 40;
   const memSize = 11;
   let p = getPageDimensions();
   setPageDimensions(210, 297, 10, 8, 14);
