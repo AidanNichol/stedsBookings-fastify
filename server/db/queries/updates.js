@@ -6,19 +6,23 @@ var { eventEmitter } = require('../../eventEmitter');
 const { bookingCount } = require('../../routes/bookings/walkRoutes.js');
 const { memberIndex } = require('../../routes/bookings/memberRoutes');
 // const { bankingEvent } = require('../../routes/bookings/bankingRoutes');
-async function refreshBookingCount() {
-  console.log('refreshing', 'BookingCount');
-  let data = await bookingCount();
-  // console.log('emmitting', data);
-  qEvent({ event: 'refreshBookingCount', ...data });
-}
+// async function refreshBookingCount() {
+//   console.log('refreshing', 'BookingCount');
+//   let data = await bookingCount();
+//   // console.log('emmitting', data);
+//   qEvent({ event: 'refreshBookingCount', ...data });
+// }
 
-const eventsQueue = [];
+let eventsQueue = [];
 function qEvent(evnt) {
+  if (_.isEqual(evnt, eventsQueue[0])) return;
   eventsQueue.push(evnt);
   console.log(chalk.white.bgRed('queued======>'), evnt, eventsQueue.length);
 }
 function sendEvents() {
+  // console.log(chalk.white.bgGreenBright('orig queue'), eventsQueue);
+  // eventsQueue = _.uniqBy(eventsQueue, _.isEqual);
+  // console.log(chalk.white.bgGreenBright('uniq queue'), eventsQueue);
   while (eventsQueue.length > 0) {
     let evnt = eventsQueue.shift();
     console.log(chalk.white.bgGreen('emitting======>'), evnt, eventsQueue.length);
@@ -40,14 +44,24 @@ module.exports.withPatches = async (patches) => {
         case 'Booking':
           await processItem(op, path, value, table, key, item, t);
           result.push({ op, path, patch: 'applied' });
-          var memberId = value && value.bookingId && value.bookingId.substr(11);
+          var memberId = key.substr(11);
           qEvent({ event: 'bookingChange', memberId });
+          console.log(
+            chalk.white.bgBlueBright('queueing member bookingChange'),
+            path,
+            key,
+          );
           bookingChange = true;
           break;
         case 'Payment':
-          await processItem(op, path, value, table, key, item, t);
+          var accountId;
+          if (op === 'remove') accountId = await removePayment(key, t);
+          else {
+            await processItem(op, path, value, table, key, item, t);
+            accountId = value.accountId;
+          }
           result.push({ op, path, patch: 'applied' });
-          qEvent({ event: 'bookingChange', accountId: value.accountId });
+          qEvent({ event: 'bookingChange', accountId });
           break;
         case 'BookingLog':
         case 'Allocation':
@@ -137,7 +151,13 @@ const createItem = async (op, path, value, table, key, item, t) => {
     await models[table].create(value, { transaction: t });
   }
 };
-
+const removePayment = async (paymentId, t) => {
+  const pay = await models.Payment.findByPk(paymentId, { transaction: t });
+  console.log('deleting', pay);
+  let aNo = await models.Allocation.destroy({ where: { paymentId }, transaction: t });
+  let pNo = await models.Payment.destroy({ where: { paymentId }, transaction: t });
+  return pay.accountId;
+};
 const processMembers = async (op, path, value, memberId, item, t) => {
   console.log('processMembers', op, path, value, memberId, item);
   if (item) {
