@@ -1,6 +1,6 @@
 {
   "name": "steds-booking-fastify",
-  "version": "0.1.111",
+  "version": "0.1.112-0",
   "private": true,
   "default": "dist/index.js",
   "targets": {
@@ -42,7 +42,7 @@
     "ws": "^7.2.5"
   },
   "scripts": {
-    "preinstall": "npx  only-allow pnpm",
+    "preinstall-disable": "npx  only-allow pnpm",
     "server": "node ./src/server/index.js",
     "deadfile": "./deadfile.sh",
     "servertest": "sirv dist/index.js",
