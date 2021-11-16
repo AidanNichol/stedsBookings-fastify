@@ -68,8 +68,14 @@ async function walkRoutes(fastify) {
     const data = walkdayData();
     return data;
   });
-  fastify.get(`/bookingCount`, async () => {
+  fastify.get(`/bookingCount0`, async () => {
     return bookingCount();
+  });
+  fastify.get(`/bookingCount`, async () => {
+    return bookingCount2();
+  });
+  fastify.get(`/bookingCount2`, async () => {
+    return bookingCount2();
   });
 }
 module.exports = { walkRoutes, bookingCount, walkdayData, allBuslists, numberWL };
@@ -111,6 +117,31 @@ async function bookingCount() {
   });
   data = data.map((w) => {
     w = w.get({ plain: true });
+    w.available = w.capacity - w.booked;
+    w.full = w.capacity - w.booked - w.waiting <= 0;
+    return w;
+  });
+  // console.log('booking count returning:\n', data);
+  return data;
+}
+async function bookingCount2() {
+  let data = await models.Walk.findAll({
+    where: { firstBooking: { [Op.lte]: today() }, closed: false },
+
+    include: [
+      {
+        model: models.Booking,
+        where: { status: ['B', 'C', 'W'] },
+        attributes: ['status'],
+        required: false,
+      },
+    ],
+  });
+  data = data.map((w) => {
+    let { Bookings, ...rest } = w.get({ plain: true });
+    let bookings = _.mapValues(_.groupBy(Bookings, 'status'), (v) => v.length);
+    let { B: booked = 0, C: cars = 0, W: waiting = 0 } = bookings;
+    w = { ...rest, booked, cars, waiting };
     w.available = w.capacity - w.booked;
     w.full = w.capacity - w.booked - w.waiting <= 0;
     return w;
