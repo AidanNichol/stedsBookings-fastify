@@ -1,6 +1,6 @@
 {
   "name": "steds-booking-fastify",
-  "version": "0.1.112-3",
+  "version": "0.1.112-4",
   "private": true,
   "default": "dist/index.js",
   "targets": {
@@ -13,7 +13,6 @@
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
-    "chalk": "^4.0.0",
     "clear": "^0.1.0",
     "date-fns": "^2.12.0",
     "dotenv": "^10.0.0",
@@ -52,6 +51,7 @@
     "parcel": "parcel build server/index.js",
     "build2": "esbuild server/index.js --bundle --platform=node --target=node12.14 --outdir=dist --format=cjs --external:pg-hstore",
     "deploy": "clear && yarn version --patch && node -r dotenv/config deploy.mjs",
+    "auditAllocations": "clear && node ./setup/auditAllocations.mjs",
     "downloadDB": "clear && node -r dotenv/config downloadDB.mjs",
     "uploadDB": "clear && yarn version --prerelease && node -r dotenv/config uploadDB.mjs",
     "migrate": "node --trace-warnings ./setup/migrateJustMembers.js",
@@ -75,6 +75,8 @@
     "@rollup/plugin-json": "^4.1.0",
     "@rollup/plugin-node-resolve": "^13.0.0",
     "basic-ftp": "^4.6.6",
+    "chalk": "^4.1.2",
+    "chalk-template": "^0.2.0",
     "deadfile": "^1.2.2",
     "eslint": "^7.28.0",
     "eslint-config-prettier": "^8.3.0",
