@@ -1,6 +1,6 @@
 {
   "name": "steds-booking-fastify",
-  "version": "0.1.112-4",
+  "version": "0.1.112-5",
   "private": true,
   "default": "dist/index.js",
   "targets": {
@@ -35,7 +35,6 @@
     "pino": "^6.13.3",
     "sequelize": "^6.6.2",
     "sequelize-cli": "^6.2.0",
-    "sprintf-js": "^1.1.2",
     "sqlite3": "^5.0.2",
     "svg-arc-to-cubic-bezier": "^3.2.0",
     "ws": "^7.2.5"
@@ -52,6 +51,7 @@
     "build2": "esbuild server/index.js --bundle --platform=node --target=node12.14 --outdir=dist --format=cjs --external:pg-hstore",
     "deploy": "clear && yarn version --patch && node -r dotenv/config deploy.mjs",
     "auditAllocations": "clear && node ./setup/auditAllocations.mjs",
+    "auditBankings": "clear && node ./setup/auditBankings.mjs",
     "downloadDB": "clear && node -r dotenv/config downloadDB.mjs",
     "uploadDB": "clear && yarn version --prerelease && node -r dotenv/config uploadDB.mjs",
     "migrate": "node --trace-warnings ./setup/migrateJustMembers.js",
@@ -82,7 +82,8 @@
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^3.4.0",
     "log-update": "^4.0.0",
-    "nodemon": "^2.0.12"
+    "nodemon": "^2.0.12",
+    "sprintf-js": "^1.1.2"
   },
   "volta": {
     "node": "12.22.1"
