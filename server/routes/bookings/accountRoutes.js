@@ -1,5 +1,8 @@
 const { Op } = require('sequelize');
 const models = require('../../../models');
+const { userTransactionRpt } = require('../../../ReportsPdf/userTransactionRpt');
+const fs = require('fs');
+const path = require('path');
 
 async function accountRoutes(fastify) {
   fastify.get(`/index`, async () => {
@@ -30,6 +33,17 @@ async function accountRoutes(fastify) {
   fastify.get(`/activePayments/:accountId/:startDate`, async (req) => {
     const payments = await paymentsData(req.params);
     return payments;
+  });
+  fastify.get(`/userTransactionsRpt/:accountId/:startDate/:endDate`, async (req, res) => {
+    let { accountId, startDate, endDate } = req.params;
+    if (endDate < startDate) startDate = endDate;
+    let bookingsRaw = await bookingsData({ accountId, startDate });
+    let paymentsRaw = await paymentsData({ accountId, startDate });
+
+    const fileName = await userTransactionRpt(accountId, bookingsRaw, paymentsRaw);
+    res.header('Content-Disposition', `inline; filename="${fileName}"`);
+    const stream = fs.createReadStream(path.resolve(`documents/${fileName}`));
+    res.type('application/pdf').send(stream);
   });
 
   fastify.get(`/bookingsData/:accountId/:startDate/:endDate`, async (req) => {
@@ -75,7 +89,6 @@ async function accountRoutes(fastify) {
     return res;
   });
 }
-module.exports = accountRoutes;
 
 async function bookingsData({ accountId, startDate, endDate }) {
   if (startDate === '0000-00-00') return {};
@@ -96,7 +109,7 @@ async function bookingsData({ accountId, startDate, endDate }) {
       { owing: 0 },
     ],
   };
-  let where = endDate === 'active' ? active : historic;
+  let where = typeof endDate === 'string' && endDate !== 'active' ? historic : active;
   let res = await models.Account.findByPk(accountId, {
     attributes: ['accountId', 'name'],
     include: [
@@ -163,3 +176,4 @@ async function paymentsData({ accountId, startDate }) {
   res = res.get({ plain: true });
   return res;
 }
+module.exports = { accountRoutes, paymentsData, bookingsData };

@@ -1,5 +1,5 @@
 // const legacyRoutes = require('./legacyRoutes.js');
-const accountRoutes = require('./accountRoutes.js');
+const { accountRoutes } = require('./accountRoutes.js');
 // const authRoutes = require('../authRoutes.js');
 const { walkRoutes } = require('./walkRoutes.js');
 const { bankingRoutes } = require('./bankingRoutes.js');
