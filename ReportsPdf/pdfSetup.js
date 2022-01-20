@@ -8,7 +8,7 @@ const local = jetpack.cwd('./ReportsPdf');
 console.log(local.cwd());
 const logo = local.read('images/St.Edwards.col4a.png', 'buffer');
 
-function pageHeader(doc, title) {
+function pageHeader(doc, title, subTitle) {
   doc.addPage();
   doc.advancedAPI((doc) => {
     const h = p.header;
@@ -17,6 +17,7 @@ function pageHeader(doc, title) {
     doc.setFontSize(h.headerHt * 0.55);
 
     doc.text('St. Edwards ABC Fellwalkers: ' + title, h.center, h.middle, align.CM);
+    subTitle && doc.text(subTitle, h.center, h.middle + 12, align.CM);
 
     doc.setFontSize(h.headerHt * 0.35);
     // doc.circle(mmToPt(200), mmToPt(17), 2, 'F');
@@ -111,7 +112,7 @@ function setPageDimensions(
   p.y = p.body.top;
   p.x = p.body.left;
 
-  console.log(p);
+  // console.log(p);
 }
 function getPageDimensions() {
   return p;
