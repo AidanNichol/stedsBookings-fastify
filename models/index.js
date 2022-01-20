@@ -26,7 +26,7 @@ Allocation.belongsTo(BookingLog, {
   foreignKey: 'bookingTransactionDate',
 });
 Allocation.belongsTo(Refund, { foreignKey: 'refundId' });
-Banking.hasMany(Payment, { foreignKey: 'bankingId' });
+Banking.hasMany(Payment, { foreignKey: 'bankingId', sourceKey: 'bankingId' });
 Booking.belongsTo(Walk, { foreignKey: 'walkId' });
 Booking.hasMany(BookingLog, {
   foreignKey: 'bookingId',
@@ -46,6 +46,7 @@ Member.hasMany(Booking, { foreignKey: 'memberId', sourceKey: 'memberId' });
 Member.hasOne(Account, { foreignKey: 'accountId' });
 Member.belongsTo(Account, { foreignKey: 'accountId' });
 Payment.belongsTo(Account, { foreignKey: 'accountId' });
+Payment.belongsTo(Banking, { foreignKey: 'bankingId' });
 Payment.hasMany(Allocation, { foreignKey: 'paymentId' });
 Payment.hasOne(Allocation, { foreignKey: 'refundId' });
 Refund.belongsTo(Account, { foreignKey: 'accountId' });
