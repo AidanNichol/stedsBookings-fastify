@@ -80,7 +80,7 @@ async function walkDayBookingSheet(doc) {
     doc.text(account.sortName, ...putHText(), align.LM);
     account.codes.map(([, code, opacity], i) => {
       doc.saveGraphicsState();
-      if (opacity) doc.setGState(new doc.GState({ opacity }));
+      // if (opacity) doc.setGState(new doc.GState({ opacity }));
       let [x1, y1] = putHText(i);
       doc.text(code, x1, y1, align.CM);
       doc.restoreGraphicsState();
@@ -109,7 +109,7 @@ async function walkDayBookingSheet(doc) {
           doc.setFontSize(0.8 * doc.getFontSize());
           doc.setTextColor('#ff0000').text(`${count}`, ...putMText(i, j), align.CM);
         } else {
-          if (opacity) doc.setGState(new doc.GState({ opacity }));
+          // if (opacity) doc.setGState(new doc.GState({ opacity }));
           // let [x1, y1] = putHText(i);
           drawIcon(doc, icon, ...putMText(i, j), 9);
         }
