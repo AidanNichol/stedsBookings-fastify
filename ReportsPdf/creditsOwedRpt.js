@@ -57,7 +57,7 @@ async function getCreditsData() {
       let credits = cr.Allocations.map((a) => ({
         ...a,
         ..._.pick(a.Booking, ['status', 'walkId', 'memberId']),
-      })).filter((a) => a.status.match(/[BC]X/));
+      })).filter((a) => a.status && a.status.match(/[BC]X/));
 
       credits = _.orderBy(credits, ['bookingTransactionDate'], ['desc']);
       credits = _.unionBy(credits, 'bookingId');
