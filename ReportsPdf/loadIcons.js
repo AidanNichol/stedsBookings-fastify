@@ -95,7 +95,7 @@ function loadIcon(doc, icon, iconColor, iconName, slash = false) {
     }
     doc.endFormObject(iconName);
   });
-  console.log({ iconColor, iconName, slash });
+  // console.log({ iconColor, iconName, slash });
 }
 function debugPath(doc, pdfPath) {
   let i = 0;
