@@ -54,14 +54,17 @@ module.exports.withPatches = async (patches) => {
           bookingChange = true;
           break;
         case 'Payment':
+        case 'Refund':
           var accountId;
-          if (op === 'remove') accountId = await removePayment(key, t);
-          else {
+          if (op === 'remove') {
+            if (table === 'Payment') accountId = await removePayment(key, t);
+            if (table === 'Refund') accountId = await removeRefund(key, t);
+          } else {
             await processItem(op, path, value, table, key, item, t);
-            accountId = value.accountId;
+            accountId = (value || {}).accountId;
           }
           result.push({ op, path, patch: 'applied' });
-          qEvent({ event: 'bookingChange', accountId });
+          accountId && qEvent({ event: 'bookingChange', accountId });
           break;
         case 'BookingLog':
         case 'Allocation':
@@ -156,7 +159,17 @@ const removePayment = async (paymentId, t) => {
   console.log('deleting', pay);
   let aNo = await models.Allocation.destroy({ where: { paymentId }, transaction: t });
   let pNo = await models.Payment.destroy({ where: { paymentId }, transaction: t });
+  console.log('detroyed', pNo, 'payments', `${aNo} Allocations`);
   return pay.accountId;
+};
+const removeRefund = async (refundId, t) => {
+  const rfnd = await models.Refund.findByPk(refundId, { transaction: t });
+  console.log('deleting', rfnd);
+  let aNo = await models.Allocation.destroy({ where: { refundId }, transaction: t });
+  let rNo = await models.Refund.destroy({ where: { refundId }, transaction: t });
+  console.log('detroyed', `${rNo} Refunds`, `${aNo} Allocations`);
+
+  return rfnd.accountId;
 };
 const processMembers = async (op, path, value, memberId, item, t) => {
   console.log('processMembers', op, path, value, memberId, item);
