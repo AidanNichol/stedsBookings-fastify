@@ -12,6 +12,7 @@ const Booking = {
   fee: { type: DataTypes.NUMBER, defaultValue: 0 },
   late: { type: DataTypes.BOOLEAN, defaultValue: false },
   updatedAt: DataTypes.STRING,
+  createdAt: DataTypes.STRING,
 };
 
 module.exports = Booking;
