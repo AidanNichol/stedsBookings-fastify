@@ -19,3 +19,4 @@ migrations
 *.old.sqlite
 /setup
 ReportsPdf/testPdf.js
+.unimportedrc.json

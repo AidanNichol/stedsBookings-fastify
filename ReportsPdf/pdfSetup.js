@@ -67,6 +67,9 @@ function setPageDimensions(
   const margin = mmToPt(pMarginMm);
   const headerHt = mmToPt(pHeaderHtMm);
   const subHead = mmToPt(subHeadMm);
+  setPageDimensionsBase(width, height, margin, headerHt, subHead);
+}
+function setPageDimensionsBase(width, height, margin, headerHt, subHead) {
   p.margin = margin;
   p.page = {
     left: 0,

@@ -1,6 +1,9 @@
 const { Op } = require('sequelize');
 const models = require('../../../models');
-const { userTransactionRpt } = require('../../../ReportsPdf/userTransactionRpt');
+// const { userTransactionRpt } = require('../../../ReportsPdf/userTransactionRpt2');
+const { userTransactionRpt3 } = require('../../../ReportsPdf/userTransactionRpt3');
+const { getUserTransactionData } = require('../../../ReportsPdf/getUserTransactionData');
+
 const fs = require('fs');
 const path = require('path');
 
@@ -34,17 +37,42 @@ async function accountRoutes(fastify) {
     const payments = await paymentsData(req.params);
     return payments;
   });
-  fastify.get(`/userTransactionsRpt/:accountId/:startDate/:endDate`, async (req, res) => {
-    let { accountId, startDate, endDate } = req.params;
-    if (endDate < startDate) startDate = endDate;
-    let bookingsRaw = await bookingsData({ accountId, startDate });
-    let paymentsRaw = await paymentsData({ accountId, startDate });
-
-    const fileName = await userTransactionRpt(accountId, bookingsRaw, paymentsRaw);
+  fastify.get(`/activeData/:accountId/:startDate`, async (req) => {
+    let { accountId, startDate } = req.params;
+    const data = await getUserTransactionData(accountId, startDate);
+    return data;
+  });
+  // fastify.post(`/transRpt0`, async (req) => {
+  //   console.log('transRpt');
+  //   const data = req.body;
+  //   const fileName = await userTransactionRpt(data);
+  //   console.log('transRpt', fileName);
+  //   return { fileName };
+  // });
+  fastify.post(`/transRpt`, async (req) => {
+    console.log('transRpt3');
+    const data = req.body;
+    const fileName = await userTransactionRpt3(data);
+    console.log('transRpt', fileName);
+    return { fileName };
+  });
+  fastify.get(`/transRpt/:fileName`, async (req, res) => {
+    const { fileName } = req.params;
     res.header('Content-Disposition', `inline; filename="${fileName}"`);
     const stream = fs.createReadStream(path.resolve(`documents/${fileName}`));
     res.type('application/pdf').send(stream);
   });
+  // fastify.get(`/userTransactionsRpt/:accountId/:startDate/:endDate`, async (req, res) => {
+  //   let { accountId, startDate, endDate } = req.params;
+  //   if (endDate < startDate) startDate = endDate;
+  //   let bookingsRaw = await bookingsData({ accountId, startDate });
+  //   let paymentsRaw = await paymentsData({ accountId, startDate });
+
+  //   const fileName = await userTransactionRpt(accountId, bookingsRaw, paymentsRaw);
+  //   res.header('Content-Disposition', `inline; filename="${fileName}"`);
+  //   const stream = fs.createReadStream(path.resolve(`documents/${fileName}`));
+  //   res.type('application/pdf').send(stream);
+  // });
 
   fastify.get(`/bookingsData/:accountId/:startDate/:endDate`, async (req) => {
     const bookings = await bookingsData(req.params);

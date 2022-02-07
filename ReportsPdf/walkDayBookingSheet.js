@@ -78,7 +78,7 @@ async function walkDayBookingSheet(doc) {
     doc.roundedRect(x, y, colWidth, boxHeight, 4, 4, 'S');
     doc.setFontSize(11);
     doc.text(account.sortName, ...putHText(), align.LM);
-    account.codes.map(([, code, opacity], i) => {
+    account.codes.map(([, code], i) => {
       doc.saveGraphicsState();
       // if (opacity) doc.setGState(new doc.GState({ opacity }));
       let [x1, y1] = putHText(i);
@@ -97,11 +97,11 @@ async function walkDayBookingSheet(doc) {
     account.Members.map(({ shortName, icons }, i) => {
       doc.text(shortName + '   ', ...putMText(i, 0), align.RM);
 
-      account.codes.forEach(([walkId, , opacity], j) => {
+      account.codes.forEach(([walkId, ], j) => {
         let icon = icons[walkId] || 'square';
         let count = null;
         if (_.isArray(icon)) {
-          [icon, count, opacity = 0.5] = icon;
+          [icon, count] = icon;
         }
         doc.saveGraphicsState();
         if (count) {
