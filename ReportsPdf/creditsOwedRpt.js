@@ -35,7 +35,7 @@ async function getCreditsData() {
             {
               model: models.BookingLog,
               attributes: ['id', 'req', 'dat', 'fee', 'late'],
-              include: { model: models.Allocation, required: false },
+              // include: { model: models.Allocation, required: false },
             },
           ],
         },

@@ -38,7 +38,7 @@ async function paymentRoutes(fastify) {
             limit: 1,
             where: { fee: { [Op.ne]: 0 } },
             attributes: ['id', 'req', 'dat', 'fee', 'late'],
-            include: { model: models.Allocation, required: false },
+            // include: { model: models.Allocation, required: false },
           },
         },
       },

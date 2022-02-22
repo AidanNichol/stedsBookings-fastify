@@ -107,7 +107,7 @@ async function accountRoutes(fastify) {
               {
                 model: models.BookingLog,
                 attributes: ['id', 'req', 'dat', 'fee', 'late'],
-                include: { model: models.Allocation, required: false },
+                // include: { model: models.Allocation, required: false },
               },
             ],
           },
@@ -155,7 +155,7 @@ async function bookingsData({ accountId, startDate, endDate }) {
               {
                 model: models.BookingLog,
                 attributes: ['id', 'req', 'dat', 'fee', 'late'],
-                include: { model: models.Allocation, required: false },
+                // include: { model: models.Allocation, required: false },
               },
               {
                 model: models.Allocation,

@@ -32,7 +32,7 @@ async function bookingRoutes(fastify) {
           model: models.BookingLog,
           where: { fee: { [Op.ne]: 0 } },
           attributes: ['id', 'req', 'dat', 'fee', 'late'],
-          include: { model: models.Allocation, required: false },
+          // include: { model: models.Allocation, required: false },
         },
       ],
     });

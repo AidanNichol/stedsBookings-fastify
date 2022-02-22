@@ -1,7 +1,6 @@
 const { User } = require('../../models');
 const bcrypt = require('bcryptjs');
 const getenv = require('getenv');
-require('dotenv').config();
 
 async function authRoutes(fastify) {
   fastify.register(require('fastify-secure-session'), {
