@@ -7,7 +7,6 @@ specifiers:
   basic-ftp: ^4.6.6
   bcryptjs: ^2.4.3
   chalk: ^4.1.2
-  chalk-template: ^0.2.0
   clear: ^0.1.0
   date-fns: ^2.28.0
   deadfile: ^1.2.2
@@ -41,12 +40,10 @@ specifiers:
   sprintf-js: ^1.1.2
   svg-arc-to-cubic-bezier: ^3.2.0
   svg-to-pdfkit: ^0.1.8
-  ws: ^8.5.0
 
 dependencies:
   bcryptjs: 2.4.3
   chalk: 4.1.2
-  chalk-template: 0.2.0
   clear: 0.1.0
   date-fns: 2.28.0
   dotenv: 10.0.0
@@ -73,7 +70,6 @@ dependencies:
   sequelize-cli: 6.4.1
   svg-arc-to-cubic-bezier: 3.2.0
   svg-to-pdfkit: 0.1.8
-  ws: 8.5.0
 
 devDependencies:
   '@rollup/plugin-commonjs': 21.0.1
@@ -665,13 +661,6 @@ packages:
       svg-pathdata: 6.0.3
     dev: false
     optional: true
-
-  /chalk-template/0.2.0:
-    resolution: {integrity: sha512-H7YkR8dEw0oSwfcPdnPh5h3lG8r/oZgu9GXMfbBcF3aguZHnJUWrQb/YSBdoIgt0e4oBDymKFXfUQDHd20VSnA==}
-    engines: {node: '>=12'}
-    dependencies:
-      chalk: 4.1.2
-    dev: false
 
   /chalk/2.4.2:
     resolution: {integrity: sha512-Mti+f9lpJNcwF4tWV8/OrTTtF1gZi+f8FqlyAdouralcFWFQWF2+NgCHShjkCb+IFBLq9buZwE1xckQU4peSuQ==}
@@ -4141,19 +4130,6 @@ packages:
       signal-exit: 3.0.7
       typedarray-to-buffer: 3.1.5
     dev: true
-
-  /ws/8.5.0:
-    resolution: {integrity: sha512-BWX0SWVgLPzYwF8lTzEy1egjhS4S4OEAHfsO8o65WOVsrnSRGaSiUaa9e0ggGlkMTtBlmOpEXiie9RUcBO86qg==}
-    engines: {node: '>=10.0.0'}
-    peerDependencies:
-      bufferutil: ^4.0.1
-      utf-8-validate: ^5.0.2
-    peerDependenciesMeta:
-      bufferutil:
-        optional: true
-      utf-8-validate:
-        optional: true
-    dev: false
 
   /xdg-basedir/4.0.0:
     resolution: {integrity: sha512-PSNhEJDejZYV7h50BohL09Er9VaIefr2LMAf3OEmpCkjOi34eYyQYAXUTjEQtZJTKcF0E2UKTh+osDLsgNim9Q==}
