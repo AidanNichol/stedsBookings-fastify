@@ -9,6 +9,8 @@ const username = {
   username: { allowNull: false, unique: true, type: DataTypes.STRING },
   password: { allowNull: false, type: DataTypes.STRING },
   roles: DataTypes.STRING,
+  email: DataTypes.STRING,
+  phone: DataTypes.STRING,
 };
 
 module.exports = username;

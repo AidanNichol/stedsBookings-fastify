@@ -13,7 +13,7 @@ const Walk = {
   capacity: DataTypes.INTEGER,
   closed: DataTypes.BOOLEAN,
   completed: { type: DataTypes.BOOLEAN, defaultValue: null },
-  fee: DataTypes.INTEGER,
+  fee: DataTypes.FLOAT,
   firstBooking: DataTypes.STRING,
   lastCancel: DataTypes.STRING,
   venue: DataTypes.STRING,
@@ -39,7 +39,9 @@ const Walk = {
   displayDate: {
     type: DataTypes.VIRTUAL,
     get() {
-      if (!this.walkId) return '';
+      if (!this.walkId) {
+        return '';
+      }
       const tdat = parseISO(this.walkId.substr(1));
       return format(tdat, 'dd MMM');
     },

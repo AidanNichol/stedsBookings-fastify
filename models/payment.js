@@ -13,8 +13,8 @@ const Payment = {
   req: DataTypes.STRING,
   who: DataTypes.STRING,
   note: DataTypes.STRING,
-  amount: DataTypes.INTEGER,
-  available: DataTypes.INTEGER,
+  amount: DataTypes.FLOAT,
+  available: DataTypes.FLOAT,
   updatedAt: DataTypes.STRING,
 };
 module.exports = Payment;

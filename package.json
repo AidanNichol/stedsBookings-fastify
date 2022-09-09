@@ -84,10 +84,12 @@
     "eslint-config-prettier": "^8.4.0",
     "eslint-plugin-prettier": "^4.0.0",
     "log-update": "^5.0.0",
+    "mysql": "^2.18.1",
     "nodemon": "^2.0.15",
+    "pure-orm": "^3.0.0",
     "sprintf-js": "^1.1.2"
   },
   "volta": {
-    "node": "12.22.1"
+    "node": "16.13.2"
   }
 }

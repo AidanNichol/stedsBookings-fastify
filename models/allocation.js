@@ -9,7 +9,7 @@ const Allocation = {
   bookingId: DataTypes.STRING,
   paymentId: DataTypes.STRING,
   refundId: DataTypes.STRING,
-  amount: DataTypes.INTEGER,
+  amount: DataTypes.FLOAT,
   updatedAt: DataTypes.STRING,
 };
 

@@ -1,3 +1,4 @@
+const { FLOAT } = require('sequelize');
 const { DataTypes } = require('sequelize');
 const BookingLog = {
   id: {
@@ -10,7 +11,7 @@ const BookingLog = {
   req: DataTypes.STRING,
   who: DataTypes.STRING,
   note: DataTypes.STRING,
-  fee: { type: DataTypes.INTEGER, defaultValue: 0 },
+  fee: { type: FLOAT, defaultValue: 0 },
   late: { type: DataTypes.BOOLEAN, defaultValue: false },
 };
 

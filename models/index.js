@@ -12,6 +12,7 @@ let sequelize = new Sequelize({
     password: getenv('mysql_password'),
   },
   logging: false,
+  // dialectOptions: { decimalNumbers: true },
 });
 const ts = { timestamp: false, createdAt: false, updatedAt: false };
 const noAction = { onDelete: 'NO ACTION', onUpdate: 'NO ACTION' };
