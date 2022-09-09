@@ -8,14 +8,14 @@ const path = require('path');
 // const _ = require('lodash');
 
 async function paymentRoutes(fastify) {
-  fastify.get(`/paymentsReceivedRpt`, async (req, res) => {
+  fastify.get('/paymentsReceivedRpt', async (req, res) => {
     let fileName = await paymentsReceivedRpt();
-    console.log('about to send members report');
+    console.log('about to send members report', req.params);
     res.header('Content-Disposition', `inline; filename="${fileName}"`);
     const stream = fs.createReadStream(path.resolve(`documents/${fileName}`));
     res.type('application/pdf').send(stream);
   });
-  fastify.get(`/paymentsMade`, async () => {
+  fastify.get('/paymentsMade', async () => {
     return await models.Payment.findAll({
       order: ['paymentId'],
       where: {

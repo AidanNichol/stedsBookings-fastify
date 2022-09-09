@@ -8,7 +8,7 @@ const fs = require('fs');
 const path = require('path');
 
 async function accountRoutes(fastify) {
-  fastify.get(`/index`, async () => {
+  fastify.get('/index', async () => {
     return await models.Account.findAll({
       attributes: [['accountId', 'id'], 'accountId', 'name', 'sortName'],
       include: [
@@ -29,17 +29,18 @@ async function accountRoutes(fastify) {
     });
   });
 
-  fastify.get(`/activeBookings/:accountId/:startDate`, async (req) => {
+  fastify.get('/activeBookings/:accountId/:startDate', async (req) => {
     const account = await bookingsData({ ...req.params, endDate: 'active' });
     return account;
   });
-  fastify.get(`/activePayments/:accountId/:startDate`, async (req) => {
+  fastify.get('/activePayments/:accountId/:startDate', async (req) => {
     const payments = await paymentsData(req.params);
     return payments;
   });
-  fastify.get(`/activeData/:accountId/:startDate`, async (req) => {
+  fastify.get('/activeData/:accountId/:startDate', async (req) => {
     let { accountId, startDate } = req.params;
     const data = await getUserTransactionData(accountId, startDate);
+    console.log('activeData', data);
     return data;
   });
   // fastify.post(`/transRpt0`, async (req) => {
@@ -49,14 +50,14 @@ async function accountRoutes(fastify) {
   //   console.log('transRpt', fileName);
   //   return { fileName };
   // });
-  fastify.post(`/transRpt`, async (req) => {
+  fastify.post('/transRpt', async (req) => {
     console.log('transRpt3');
     const data = req.body;
     const fileName = await userTransactionRpt3(data);
     console.log('transRpt', fileName);
     return { fileName };
   });
-  fastify.get(`/transRpt/:fileName`, async (req, res) => {
+  fastify.get('/transRpt/:fileName', async (req, res) => {
     const { fileName } = req.params;
     res.header('Content-Disposition', `inline; filename="${fileName}"`);
     const stream = fs.createReadStream(path.resolve(`documents/${fileName}`));
@@ -74,18 +75,18 @@ async function accountRoutes(fastify) {
   //   res.type('application/pdf').send(stream);
   // });
 
-  fastify.get(`/bookingsData/:accountId/:startDate/:endDate`, async (req) => {
+  fastify.get('/bookingsData/:accountId/:startDate/:endDate', async (req) => {
     const bookings = await bookingsData(req.params);
 
     return bookings;
   });
-  fastify.get(`/paymentsData/:accountId/:startDate/:endDate`, async (req) => {
+  fastify.get('/paymentsData/:accountId/:startDate/:endDate', async (req) => {
     const payments = await paymentsData(req.params);
 
     return payments;
   });
 
-  fastify.get(`/creditsOwed`, async () => {
+  fastify.get('/creditsOwed', async () => {
     let res = await models.Payment.findAll({
       order: ['paymentId'],
       where: { available: { [Op.gt]: 0 } },
@@ -119,21 +120,23 @@ async function accountRoutes(fastify) {
 }
 
 async function bookingsData({ accountId, startDate, endDate }) {
-  if (startDate === '0000-00-00') return {};
+  if (startDate === '0000-00-00') {
+    return {};
+  }
   // try {
   console.log('bookingsData', { accountId, startDate, endDate });
 
   const active = {
     [Op.or]: [
-      { bookingId: { [Op.gte]: 'W' + startDate } },
+      { bookingId: { [Op.gte]: `W${startDate}` } },
       { updatedAt: { [Op.gte]: startDate } },
       { owing: { [Op.gt]: 0 } },
     ],
   };
   const historic = {
     [Op.and]: [
-      { bookingId: { [Op.gte]: 'W' + endDate } },
-      { bookingId: { [Op.lte]: 'W' + startDate } },
+      { bookingId: { [Op.gte]: `W${endDate}` } },
+      { bookingId: { [Op.lte]: `W${startDate}` } },
       { owing: 0 },
     ],
   };
@@ -143,7 +146,7 @@ async function bookingsData({ accountId, startDate, endDate }) {
     include: [
       {
         model: models.Member,
-        attributes: ['memberId', 'firstName', 'lastName', 'shortName'],
+        // attributes: ['memberId', 'firstName', 'lastName', 'shortName'],
         // exclude: { attributes: ['createdAt', 'address'] },
         include: [
           {
@@ -154,8 +157,7 @@ async function bookingsData({ accountId, startDate, endDate }) {
             include: [
               {
                 model: models.BookingLog,
-                attributes: ['id', 'req', 'dat', 'fee', 'late'],
-                // include: { model: models.Allocation, required: false },
+                // attributes: ['id', 'req', 'dat', 'fee', 'late'],
               },
               {
                 model: models.Allocation,
@@ -173,6 +175,7 @@ async function bookingsData({ accountId, startDate, endDate }) {
   console.log('bookingsData', res);
   return res;
 }
+
 async function paymentsData({ accountId, startDate }) {
   let res = await models.Account.findByPk(accountId, {
     attributes: ['accountId', 'name'],

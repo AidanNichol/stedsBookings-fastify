@@ -19,13 +19,13 @@ async function walkRoutes(fastify) {
   //   const movies = await queries.getInfo();
   //   return movies;
   // });
-  fastify.get(`/`, async () => {
+  fastify.get('/', async () => {
     return {
       node: process.versions.node,
       version,
     };
   });
-  fastify.get(`/index`, async () => {
+  fastify.get('/index', async () => {
     return await models.Walk.findAll({
       attributes: [
         ['walkId', 'id'],
@@ -38,14 +38,14 @@ async function walkRoutes(fastify) {
       ],
     });
   });
-  fastify.get(`/closeWalk/:walkId`, async (req) => {
+  fastify.get('/closeWalk/:walkId', async (req) => {
     const { walkId } = req.params;
     await models.Walk.update({ closed: true }, { where: { walkId: walkId } });
     eventEmitter.emit('change_event', { event: 'reload' });
   });
-  fastify.get(`/firstBooking`, async () => {
+  fastify.get('/firstBooking', async () => {
     console.log('today', today());
-    fastify.log.info('today ' + today());
+    fastify.log.info(`today ${today()}`);
     const first = await models.Walk.findOne({
       order: ['walkId'],
       limit: 1,
@@ -54,27 +54,27 @@ async function walkRoutes(fastify) {
         closed: { [Op.ne]: true },
       },
     });
-    fastify.log.info('firstBooking ' + JSON.stringify(first));
+    fastify.log.info(`firstBooking ${JSON.stringify(first)}`);
     return first;
   });
-  fastify.get(`/allBuslists`, async () => {
+  fastify.get('/allBuslists', async () => {
     return await allBuslists();
   });
-  fastify.get(`/WLindex`, async () => {
+  fastify.get('/WLindex', async () => {
     let data = await allBuslists();
     return await numberWL(data);
   });
-  fastify.get(`/walkdayData`, async () => {
+  fastify.get('/walkdayData', async () => {
     const data = walkdayData();
     return data;
   });
-  fastify.get(`/bookingCount0`, async () => {
+  fastify.get('/bookingCount0', async () => {
     return bookingCount();
   });
-  fastify.get(`/bookingCount`, async () => {
+  fastify.get('/bookingCount', async () => {
     return bookingCount2();
   });
-  fastify.get(`/bookingCount2`, async () => {
+  fastify.get('/bookingCount2', async () => {
     return bookingCount2();
   });
 }
@@ -96,7 +96,7 @@ async function bookingCount() {
     FROM bookings AS booking
     WHERE
     booking.walkId = Walk.walkId`;
-
+  console.log('-----------bookingCount-----------------------');
   let data = await models.Walk.findAll({
     where: { [Op.and]: [{ firstBooking: { [Op.lte]: today() } }, { closed: false }] },
     attributes: [
@@ -125,6 +125,8 @@ async function bookingCount() {
   return data;
 }
 async function bookingCount2() {
+  console.log('-----------bookingCount2-----------------------');
+
   let data = await models.Walk.findAll({
     where: { firstBooking: { [Op.lte]: today() }, closed: false },
 
@@ -203,7 +205,7 @@ async function walkdayData() {
             attributes: ['owing', 'status', 'walkId', 'bookingId'],
             where: {
               [Op.or]: [
-                { bookingId: { [Op.gte]: 'W' + startDate } },
+                { bookingId: { [Op.gte]: `W${startDate}` } },
                 { updatedAt: { [Op.gte]: startDate } },
                 { owing: { [Op.gt]: 0 } },
               ],
