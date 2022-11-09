@@ -57,6 +57,8 @@
     "deploy": "clear && yarn version --patch && node -r dotenv/config deploy.mjs",
     "auditAllocations": "clear && node ./setup/auditAllocations.mjs",
     "auditBankings": "clear && node ./setup/auditBankings.mjs",
+    "newWalks": "node ./newWalks/createdNewWalks.mjs",
+    "nodeVesion": "node -v",
     "addCreatedAt": "clear && node ./setup/addCreatedAt.mjs",
     "downloadDB": "clear && node -r dotenv/config downloadDB.mjs",
     "uploadDB": "clear && yarn version --prerelease && node -r dotenv/config uploadDB.mjs",
