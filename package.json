@@ -1,6 +1,6 @@
 {
   "name": "steds-booking-fastify",
-  "version": "1.0.10",
+  "version": "1.0.11",
   "private": true,
   "default": "dist/index.js",
   "targets": {
