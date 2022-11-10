@@ -1,6 +1,6 @@
 {
   "name": "steds-booking-fastify",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "private": true,
   "default": "dist/index.js",
   "targets": {
@@ -57,8 +57,8 @@
     "deploy": "clear && yarn version --patch && node -r dotenv/config deploy.mjs",
     "auditAllocations": "clear && node ./setup/auditAllocations.mjs",
     "auditBankings": "clear && node ./setup/auditBankings.mjs",
-    "newWalksDev": "node ./newWalks/createdNewWalks.mjs",
-    "newWalksProd": "source /home/ajnichol/nodevenv/public_html/bookingsServer/16/bin/activate && cd /home/ajnichol/public_html/bookingsServer && node ./newWalks/createdNewWalks.mjs",
+    "newWalksDev": "node ./newWalks/createNewWalks.mjs",
+    "newWalksProd": "source /home/ajnichol/nodevenv/public_html/bookingsServer/16/bin/activate && cd /home/ajnichol/public_html/bookingsServer && node ./newWalks/createNewWalks.mjs",
     "nodeVersion": "node -v",
     "addCreatedAt": "clear && node ./setup/addCreatedAt.mjs",
     "downloadDB": "clear && node -r dotenv/config downloadDB.mjs",
