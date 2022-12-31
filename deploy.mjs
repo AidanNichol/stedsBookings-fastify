@@ -31,6 +31,7 @@ async function example() {
     await client.uploadFromDir('server', 'server');
     await client.uploadFromDir('models', 'models');
     await client.uploadFromDir('ReportsPdf', 'ReportsPdf');
+    await client.uploadFromDir('newWalks', 'newWalks');
     await requestRestart(client);
     console.log(await client.list('tmp'));
     // await client.rename('index.js', 'index0.js');

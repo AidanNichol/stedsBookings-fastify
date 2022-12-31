@@ -3,7 +3,7 @@ import { parseISO, format, addDays } from 'date-fns';
 import { parse } from 'csv-parse/sync';
 import jetpack from 'fs-jetpack';
 import fetch from 'node-fetch';
-const progdata = jetpack.read('setup/prog2023.csv');
+const progdata = jetpack.read('newWalks/prog2023.csv');
 
 async function create() {
   const prog = parse(progdata, {
@@ -23,12 +23,12 @@ async function create() {
       lastDate = addDays(lastDate, 14);
       date = format(lastDate, 'yyyy-MM-dd');
     }
-    console.log('walk======>', walk);
     let walkId = `W${date}`;
+    console.log('walk======>', walkId,venue);
     let lastCancel = addDays(parseISO(`${date} 18:00`), -6);
     let firstBooking = addDays(parseISO(`${date} 00:01`), -45);
-    console.log(format(lastCancel, 'EEEE'));
-    console.log(format(firstBooking, 'EEEE'));
+    // console.log(format(lastCancel, 'EEEE'));
+    // console.log(format(firstBooking, 'EEEE'));
     lastCancel = format(addDays(parseISO(`${date} 18:00`), -6), 'yyyy-MM-dd HH:mm');
     firstBooking = format(addDays(parseISO(`${date} 00:01`), -45), 'yyyy-MM-dd');
     const walkData = {
@@ -41,11 +41,7 @@ async function create() {
       closed: false,
     };
     let res = await models.Walk.create(walkData);
-    console.log(res);
-    // const patch = { op: 'add', path: ['Walk', walkId], value: walkData };
-    // res = await postData([patch]);
-    // console.log('appliedPatches', patch, res);
-    break;
+    console.log("inserted");
   }
 }
 create();
