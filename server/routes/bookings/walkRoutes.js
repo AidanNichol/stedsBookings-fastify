@@ -210,7 +210,7 @@ async function walkdayData() {
                 { owing: { [Op.gt]: 0 } },
               ],
             },
-            include: [{ model: models.Walk, attibutes: ['shortCode', 'venue'] }],
+            include: [{ model: models.Walk, attibutes: ['shortCode', 'venue', 'fee'] }],
           },
         ],
       },

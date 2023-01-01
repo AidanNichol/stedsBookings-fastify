@@ -77,7 +77,7 @@ async function paymentsDueRpt(doc) {
     let ym = top + titleSize / 2;
 
     doc.text(account.sortName, left + hPad, ym, align.LM);
-    doc.text('£' + account.balance, right - hPad, ym, align.RM);
+    doc.text(`£${account.balance}`, right - hPad, ym, align.RM);
     for (let i = 0; i < debts.length; i++) {
       doc.setFontSize(9);
       const bkng = debts[i];
@@ -86,8 +86,14 @@ async function paymentsDueRpt(doc) {
 
       doc.text(bkng.displayDate, left + hPad, y, align.LM);
       drawIcon(doc, bkng.status, left + hPad + 64, y, 9);
+      let partCostSz = 0;
+      if (bkng.owing !== bkng.fee) {
+        let text = `£${bkng.owing}`;
+        doc.text(text, right - hPad, y, align.RM);
+        partCostSz = 9 * doc.getStringUnitWidth(text) + 4;
+      }
       doc.text(
-        fitBox(doc, bkng.name + ' ' + bkng.venue, 9, width - hPad - 72),
+        fitBox(doc, `${bkng.name} ${bkng.venue}`, 9, width - hPad - 72 - partCostSz),
         left + hPad + 72,
         y,
         align.LM,
@@ -110,9 +116,9 @@ function fitBox(doc, text, fontSize, width) {
   if (size <= width) return text;
   do {
     text = text.substr(0, text.length - 1);
-    size = fontSize * doc.getStringUnitWidth(text + '…');
+    size = fontSize * doc.getStringUnitWidth(`${text}…`);
   } while (size > width);
 
-  return text + '…';
+  return `${text}…`;
 }
 exports.paymentsDueRpt = paymentsDueRpt;

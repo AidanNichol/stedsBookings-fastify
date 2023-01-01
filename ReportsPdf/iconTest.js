@@ -5,6 +5,23 @@ const { pageHeader } = require('./pageHeader.js');
 
 function iconTest(doc) {
   pageHeader(doc, 'Icon Test');
+  doc.advancedAPI((doc) => {
+    doc.rect(30, 200, 40, 80).fill({
+      key: 'unique-pattern-key',
+      matrix: [0, 0, 0, 0, 0, 0, 0, 0],
+    });
+    for (let i = 0; i < 11; i++) {
+      drawIcon(doc, 'P', 30 + 45 * i, 400, 40);
+      drawIcon(doc, `B${i}`, 30 + 45 * i, 400, 40);
+    }
+  });
+  let bkng = { fee: 12.5, owing: 6, status: 'B' };
+  let fct = Math.round((10 * (bkng.fee - bkng.owing)) / bkng.fee);
+  let icon = `${bkng.status}${fct}`;
+  drawIcon(doc, 'P', 30 + 45, 500, 40);
+  drawIcon(doc, icon, 30 + 45, 500, 40);
+
+  pageHeader(doc, 'Icon Test');
 
   let text = 'a quite long annotation string just for test purpose';
   doc.advancedAPI((doc) => {

@@ -38,8 +38,17 @@ async function walkDayBookingSheet(doc) {
   const cSize = 30;
   printWalkDates(doc, openWalks);
 
-  const balColor = (balance) => (balance < 0 ? '#F7C5C5' : '#CCFFCF');
-  const balance = (balance) => (balance > 0 ? `£+${balance}` : `£-${-balance}`);
+  const balColor = (balance, warn) => {
+    if (warn && balance < 0) return '#ff0000';
+    return balance < 0 ? '#F7C5C5' : '#CCFFCF';
+  };
+  const balance = (balance, oldDebt) => {
+    let text = balance > 0 ? `£+${balance}` : `£-${-balance}`;
+    if (oldDebt) {
+      text += ` [${oldDebt * -1 === balance ? '=' : `£${oldDebt}`}]`;
+    }
+    return text;
+  };
   doc.setTextColor('#333333');
   for (const account of accounts) {
     const noMembs = account.Members.length;
@@ -87,17 +96,19 @@ async function walkDayBookingSheet(doc) {
     });
     if (account.balance !== 0) {
       let [x1, y1] = putAText();
-      doc.setFillColor(balColor(account.balance));
-      doc.rect(x1, y1 - memSize / 2, 25, memSize, 'F');
-      doc.text(balance(account.balance), ...putAText(), align.LM);
+      doc.setFillColor(balColor(account.balance, account.warn));
+      let text = balance(account.balance, account.oldDebt);
+      let textSize = 11 * doc.getStringUnitWidth(text) + 4;
+      doc.rect(x1, y1 - memSize / 2, textSize, memSize, 'F');
+      doc.text(text, x1, y1, align.LM);
     }
-    doc.text('Pd', ...putAText(45), align.RM);
-    drawIcon(doc, 'square', ...putAText(53), 9);
+    // doc.text('Pd', ...putAText(45), align.RM);
+    // drawIcon(doc, 'square', ...putAText(53), 9);
 
     account.Members.map(({ shortName, icons }, i) => {
-      doc.text(shortName + '   ', ...putMText(i, 0), align.RM);
+      doc.text(`${shortName}   `, ...putMText(i, 0), align.RM);
 
-      account.codes.forEach(([walkId, ], j) => {
+      account.codes.forEach(([walkId], j) => {
         let icon = icons[walkId] || 'square';
         let count = null;
         if (_.isArray(icon)) {
@@ -167,6 +178,8 @@ function gatherData(accounts, WLindex, openWalks) {
 
     account.codes = [];
     account.debt = 0;
+    account.oldDebt = 0;
+    account.warn = false;
     account.credit = account.Payments.reduce((tot, p) => tot + p.available, 0);
     account.Members.forEach((member) => {
       member.icons = {};
@@ -177,15 +190,31 @@ function gatherData(accounts, WLindex, openWalks) {
         let icon;
         if (bkng.walkId === nextWalkId && bkng.status !== 'W') WL = false;
         account.debt += bkng.owing;
+        if (bkng.walkId <= nextWalkId && bkng.owing > 0) account.oldDebt += bkng.owing;
+
         if (bkng.walkId < nextWalkId && bkng.owing > 0) {
           const code = bkng.Walk.shortCode || bkng.Walk.venue.substr(0, 4);
           account.codes.push([bkng.walkId, code, 0.4]);
         }
-        if (!bkng || bkng.status[1] === 'X') icon = 'square';
-        else if (bkng.status === 'W') {
+        let {
+          status,
+          owing,
+          Walk: { fee },
+        } = bkng ?? {};
+        if (owing > 0 && owing !== fee) account.warn = true;
+        if (!bkng || status[1] === 'X') icon = 'square';
+        else if (status === 'W') {
           icon = ['W', WLindex[bkng.bookingId]];
-        } else if (bkng.owing > 0) icon = 'P';
-        else icon = bkng.status;
+        } else if (owing === 0) {
+          icon = status;
+        } else if (owing === fee) {
+          icon = 'P';
+        } else {
+          icon = 'P';
+          let fct = Math.round((10 * (fee - owing)) / fee);
+          icon = `${status}${fct}`;
+        }
+
         member.icons[bkng.walkId] = icon;
       });
     });

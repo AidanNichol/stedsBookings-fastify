@@ -10,16 +10,47 @@ const circle = require('./images/faCircle.js');
 const square = require('./images/faSquare.js');
 const credit = require('./images/ajnCredit.js');
 const treasurer = require('./images/ajnTreasurer.js');
+const { ShadingPattern } = require('jspdf');
 let debug = false;
 
 // const slash = require('./images/faSlash.js');
 const iconWidth = {};
 const iconHeight = {};
+let Px;
 function loadIcons(doc) {
+  doc.advancedAPI((doc) => {
+    doc.addShadingPattern(
+      'unique-pattern-key',
+      new ShadingPattern(
+        'axial',
+        [0, 0, 0, 512],
+        [
+          {
+            offset: 0,
+            color: [0, 0, 0], //RGB as an array
+          },
+          // {
+          //   offset: 0.25,
+          //   color: [128, 128, 128],
+          // },
+          {
+            offset: 0.75,
+            color: [255, 255, 255],
+          },
+        ],
+      ),
+    );
+  });
+
   [bus, car, clock, pound, square, circle, credit, treasurer].map((icn) => {
     parseIcon(icn);
   });
   loadIcon(doc, bus, '#008000', 'B');
+  for (let fct = 0; fct < 11; fct++) {
+    loadIcon(doc, bus, '#008000', `B${fct}`, false, fct * 0.1);
+    loadIcon(doc, bus, '#FFA500', `BL${fct}`, true, fct * 0.1);
+    loadIcon(doc, car, '#0000ff', `C${fct}`, fct * 0.1);
+  }
   loadIcon(doc, bus, '#008000', 'BX', true);
   loadIcon(doc, bus, '#FFA500', 'BL', true);
   loadIcon(doc, car, '#0000ff', 'C');
@@ -42,6 +73,13 @@ function drawIcon(doc, name, x, y, size) {
   const ex = x - (size * (iconWidth[name] / ht)) / 2;
   doc.advancedAPI((doc) => {
     try {
+      if (/[BC]L?\d/.test(name)) {
+        const ht = iconHeight.P;
+        const scale = size / ht;
+        const ey = y - size / 2;
+        let ex = x - (size * (iconWidth.P / iconHeight.P)) / 2;
+        doc.doFormObject('P', new doc.Matrix(scale, 0, 0, scale, ex, ey));
+      }
       doc.doFormObject(name, new doc.Matrix(scale, 0, 0, scale, ex, ey));
     } catch (error) {
       console.log('draw icon error', name, scale, ex, ey, error);
@@ -57,7 +95,7 @@ function parseIcon(icon) {
     icon.pdfPaths.push(svgPathToPdfPath(svgPath));
   }
 }
-function loadIcon(doc, icon, iconColor, iconName, slash = false) {
+function loadIcon(doc, icon, iconColor, iconName, slash = false, fct) {
   doc.advancedAPI((doc) => {
     const { width, height, pdfPaths } = icon;
     const scale = 512 / height;
@@ -78,6 +116,14 @@ function loadIcon(doc, icon, iconColor, iconName, slash = false) {
 
       doc.setFillColor(iconColor);
       doc.setDrawColor(drawC[i++]);
+      if (fct !== undefined) {
+        let sz = 512 * shrink;
+        doc
+          .rect(0, 0, sz, sz * fct)
+
+          .clip()
+          .discardPath();
+      }
       doc.path(pdfPath);
       doc.fillEvenOdd();
 
@@ -114,7 +160,8 @@ const svgPathToPdfPath = (svg) => {
   const parts = svg.split(/([a-z][^a-z]*)/i).filter((s) => s.length);
   let path = [];
   let debug = '';
-  let x, y;
+  let x;
+  let y;
 
   // let seg;
   let prev = [];
