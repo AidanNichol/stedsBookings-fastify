@@ -162,7 +162,12 @@ function reducedAllocations(allocations, key) {
   allocs = _.values(allocs).map((allocs) => {
     allocs = _.sortBy(allocs, 'id');
     let amount = allocs.reduce((acc, all) => acc + all.amount, 0);
-    return { ..._.last(allocs), amount };
+    let refunded = amount
+      ? 0
+      : allocs
+          .filter((allc) => allc.amount > 0)
+          .reduce((acc, allc) => acc + allc.amount, 0);
+    return { ..._.last(allocs), amount, refunded };
   });
   return { Allocations2: allocs };
 }
