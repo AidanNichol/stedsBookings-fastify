@@ -1,7 +1,7 @@
 const { User } = require("../../models");
 const bcrypt = require("bcryptjs");
 const getenv = require("getenv");
-
+const str = (data) => JSON.stringify(data);
 async function authRoutes(fastify) {
 	fastify.register(require("fastify-cookie"));
 	fastify.register(require("fastify-session"), {
@@ -16,14 +16,14 @@ async function authRoutes(fastify) {
 	});
 	fastify.post("/login", async (request, reply) => {
 		const { username, password } = request.body;
-		fastify.log.debug(request.body, username, password);
+		fastify.log.info(str(request.body), username, password);
 		try {
 			// await request.session.delete();
 
 			const user = await User.findOne({
 				where: { username: username },
 			});
-			fastify.log.debug("User:", user);
+			fastify.log.info("User:", str(user));
 			if (!user) {
 				return { authError: `unknown username: ${username}` };
 			}
@@ -43,7 +43,7 @@ async function authRoutes(fastify) {
 
 	fastify.get("/logCheck", async (request, reply) => {
 		const data = await request.session.data;
-		fastify.log.debug("logCheck", data);
+		fastify.log.info("logCheck", str(data));
 		if (!data) {
 			reply.send({ ok: false, authError: "not logged in" });
 			return;

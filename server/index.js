@@ -31,6 +31,7 @@ var streams = [
 	{
 		level: "debug",
 		stream: fs.createWriteStream(`./logs/fastify-debug.${today}.log`),
+		timestamp: stdTimeFunctions.isoTime,
 	},
 	{
 		level: "fatal",
@@ -53,7 +54,7 @@ const fastify = fastifyPkg({
 		stream,
 		// level: 'info',
 		// file: `./logs/fastify-${today}.log`, // will use pino.destination()
-		// timestamp: stdTimeFunctions.isoTime,
+		timestamp: stdTimeFunctions.isoTime,
 	},
 });
 // const transport = pino.transport({
