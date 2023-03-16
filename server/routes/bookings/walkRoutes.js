@@ -100,7 +100,7 @@ module.exports = {
 async function bookingCount() {
 	const bCount = `
     SELECT COUNT(*) 
-    FROM bookings AS booking
+    FROM Bookings AS booking
     WHERE
     booking.walkId = Walk.walkId`;
 	console.log("-----------bookingCount-----------------------");
