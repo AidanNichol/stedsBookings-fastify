@@ -24,8 +24,8 @@ async function bookingsRoutes(fastify) {
 		// and then base64 encoded so it can be passed as a query string
 		// in the GET URL request
 		let bufferObj = Buffer.from(request.query.body, "base64");
-		let query2 = bufferObj.toString("utf8");
-		const data = await updates.withPatches(JSON.parse(query2));
+		const query = JSON.parse(bufferObj.toString("utf8"));
+		const data = await updates.withPatches(query);
 		reply.code(201).send(data);
 	});
 }
