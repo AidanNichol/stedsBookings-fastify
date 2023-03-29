@@ -16,7 +16,33 @@ async function authRoutes(fastify) {
 	});
 	fastify.post("/login", async (request, reply) => {
 		const { username, password } = request.body;
-		fastify.log.info(str(request.body), username, password);
+		fastify.log.warn(`${str(request.body)}, ${username}, password`);
+		try {
+			// await request.session.delete();
+
+			const user = await User.findOne({
+				where: { username: username },
+			});
+			fastify.log.info("User:", str(user));
+			if (!user) {
+				return { authError: `unknown username: ${username}` };
+			}
+			const ok = bcrypt.compareSync(password, user.password);
+			if (!ok) {
+				return { authError: "invalid username/password" };
+			}
+			user.roles = user.roles.split(/, ?/);
+			let data = { ok, username, roles: user.roles };
+			request.session.data = data;
+			reply.send(data);
+		} catch (err) {
+			console.warn(err);
+			throw new Error(err);
+		}
+	});
+	fastify.get("/login", async (request, reply) => {
+		const { username, password } = request.query;
+		fastify.log.warn(`${str(request.query)}, ${username}, password`);
 		try {
 			// await request.session.delete();
 

@@ -19,5 +19,14 @@ async function bookingsRoutes(fastify) {
 		const data = await updates.withPatches(request.body);
 		reply.code(201).send(data);
 	});
+	fastify.get("/patches", async (request, reply) => {
+		// the body of the request has been encoded in JSON
+		// and then base64 encoded so it can be passed as a query string
+		// in the GET URL request
+		let bufferObj = Buffer.from(request.query.body, "base64");
+		let query2 = bufferObj.toString("utf8");
+		const data = await updates.withPatches(JSON.parse(query2));
+		reply.code(201).send(data);
+	});
 }
 module.exports = bookingsRoutes;

@@ -198,7 +198,7 @@ fastify.register(authRoutes, { prefix: `${sitePrefix}/auth` });
 // !Run the server!
 const runit = async () => {
 	try {
-		await fastify.listen(4444);
+		await fastify.listen({ port: 4444 });
 	} catch (err) {
 		fastify.log.error(err);
 		// eslint-disable-next-line no-process-exit
