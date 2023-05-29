@@ -34,6 +34,7 @@ async function bookingRoutes(fastify) {
           attributes: ['id', 'req', 'dat', 'fee', 'late'],
           // include: { model: models.Allocation, required: false },
         },
+        {model: models.Allocation}
       ],
     });
   });
