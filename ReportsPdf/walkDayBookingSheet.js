@@ -212,6 +212,10 @@ function gatherData(accounts, WLindex, openWalks) {
         } else {
           icon = 'P';
           let fct = Math.round((10 * (fee - owing)) / fee);
+          if (fct>10){
+            console.log('bad fct', fee, owing, bkng, member)
+            fct = Math.min(fct, 10);
+          }
           icon = `${status}${fct}`;
         }
 
