@@ -22,7 +22,7 @@ async function example() {
       password: getenv('FTPPASSWORD'),
       secure: true,
       port: 21,
-      secureOptions: { servername: 'ukhost4u.com' },
+      secureOptions: { servername: 'orange.ukhost4u.com' },
     });
     await client.ensureDir('/public_html/bookingsServer');
 
