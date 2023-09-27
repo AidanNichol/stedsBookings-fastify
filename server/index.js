@@ -116,6 +116,13 @@ fastify.get(`/${sitePrefix}/`, async () => {
 		version,
 	};
 });
+fastify.get(`/`, async () => {
+	return {
+		hello: "world2",
+		node: process.versions.node,
+		version,
+	};
+});
 
 let msg = "";
 let lastId = null;
@@ -201,11 +208,13 @@ const runit = async () => {
 		await fastify.listen({ port: 4444 });
 	} catch (err) {
 		fastify.log.error(err);
+		console.log('listen error', err)
 		// eslint-disable-next-line no-process-exit
 		process.exit(1);
 	}
 	const msg = `version:${version}. Listening on 4444. Will restart in ${durF} @ ${tomorrowF}`;
 	fastify.log.info(msg);
+	console.log(msg)
 };
 runit();
 heartbeat();
