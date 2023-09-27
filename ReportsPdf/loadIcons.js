@@ -67,10 +67,15 @@ function loadIcons(doc) {
   loadIcon(doc, treasurer, '#000000', 'TX', true);
 }
 function drawIcon(doc, name, x, y, size) {
-  const ht = iconHeight[name];
+  const ht = iconHeight[name]??512;
   const scale = size / ht;
   const ey = y - size / 2;
-  const ex = x - (size * (iconWidth[name] / ht)) / 2;
+  const ex = x - (size * ((iconWidth[name]??512) / ht)) / 2;
+  if (!iconHeight[name]){
+     console.log('draw icon error', name, size, x, y);
+      doc.text(name, ex, ey);
+      return;
+  }
   doc.advancedAPI((doc) => {
     try {
       if (/[BC]L?\d/.test(name)) {
